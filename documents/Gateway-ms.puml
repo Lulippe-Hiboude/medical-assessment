@@ -1,0 +1,112 @@
+@startuml
+
+title Gateway-MS - Security & Auth Architecture
+
+skinparam classAttributeIconSize 0
+package "Gateway-MS" {
+    ' =======================
+    ' ENUM ROLE
+    ' =======================
+    enum Role {
+        DOCTOR
+        ORGANIZER
+    }
+
+    ' =======================
+    ' ENTITY USER
+    ' =======================
+    record InMemoryUserEntity {
+        - String username
+        - String password
+        - Role role
+    }
+
+    ' =======================
+    ' REPOSITORY
+    ' =======================
+    class InMemoryUserRepository {
+        - List<InMemoryUserEntity> users
+
+    }
+
+    ' =======================
+    ' SERVICE
+    ' =======================
+    class InMemoryUserService {
+        + User authenticate(LoginRequest request)
+    }
+
+    class AuthService {
+        + String authenticate(LoginRequest request)
+    }
+
+    ' =======================
+    ' CONTROLLER
+    ' =======================
+    class AuthController {
+        + ResponseEntity<JwtResponse> login(LoginRequest request)
+    }
+
+    ' =======================
+    ' SECURITY
+    ' =======================
+    class SecurityConfig {
+        + SecurityFilterChain securityFilterChain()
+    }
+
+    class JwtService {
+        + String generateToken(User user)
+    }
+
+    class JwtAuthenticationFilter {
+    }
+
+    class PasswordEncoder {
+    }
+
+    class "Spring Cloud Gateway Runtime" as SpringCloudGateway {
+    }
+
+   class "Route Configuration (Spring Cloud Gateway YAML)" as GatewayRoutes {
+       + /patients/**  → patient-ms
+       + /notes/**     → note-ms
+       + /risk/**      → risk-ms
+   }
+}
+package "Patient-MS" {
+
+}
+
+package "Note-MS" {
+
+}
+
+package "Risk-Assessment-MS" {
+}
+
+
+
+' =======================
+' RELATIONS
+' =======================
+InMemoryUserEntity --> Role
+
+AuthController --> AuthService
+AuthService --> InMemoryUserService
+AuthService --> JwtService
+InMemoryUserService --> InMemoryUserRepository
+InMemoryUserService --> PasswordEncoder
+
+InMemoryUserRepository --> InMemoryUserEntity
+
+JwtAuthenticationFilter --> JwtService
+SecurityConfig --> JwtAuthenticationFilter
+SecurityConfig --> PasswordEncoder
+
+SpringCloudGateway --> JwtAuthenticationFilter
+SpringCloudGateway --> GatewayRoutes
+SpringCloudGateway --> "Patient-MS"
+SpringCloudGateway --> "Note-MS"
+SpringCloudGateway --> "Risk-Assessment-MS"
+
+@enduml

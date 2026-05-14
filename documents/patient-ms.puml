@@ -1,0 +1,133 @@
+@startuml
+
+title patient-ms - UML Architecture Diagram
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+
+package "controller" {
+
+    class PatientController {
+        + createPatient(request)
+        + getPatientById(id)
+        + getAllPatients()
+        + updatePatient(id, request)
+    }
+}
+
+package "service" {
+
+    class PatientService {
+        + createPatient(request)
+        + getPatientById(id)
+        + getAllPatients()
+        + updatePatient(id, request)
+    }
+}
+
+package "repository" {
+
+    interface PatientRepository {
+        + save(patient)
+        + findById(id)
+        + findAll()
+    }
+}
+
+package "entity" {
+
+    class Patient {
+        - Long id
+        - String firstName
+        - String lastName
+        - LocalDate birthDate
+        - Gender gender
+        - String address
+        - String phone
+
+        - Instant createdAt
+        - Instant updatedAt
+    }
+
+    enum Gender {
+        MALE
+        FEMALE
+    }
+}
+
+package "dto.request" {
+
+    class CreatePatientRequest {
+        + String firstName
+        + String lastName
+        + LocalDate birthDate
+        + Gender gender
+        + String address
+        + String phone
+    }
+
+    class UpdatePatientRequest {
+        + String firstName
+        + String lastName
+        + LocalDate birthDate
+        + Gender gender
+        + String address
+        + String phone
+    }
+}
+
+package "dto.response" {
+
+    class PatientResponse {
+        + Long id
+        + String firstName
+        + String lastName
+        + LocalDate birthDate
+        + Gender gender
+        + String address
+        + String phone
+    }
+}
+
+package "mapper" {
+
+    interface PatientMapper {
+        + toEntity(request)
+        + toResponse(patient)
+    }
+}
+
+package "security" {
+
+    class SecurityConfig
+
+    class UserConfig
+}
+
+package "openapi" {
+
+    class OpenApiConfig
+}
+
+Patient --> Gender
+
+PatientController --> PatientService
+
+PatientService --> PatientRepository
+PatientService --> PatientMapper
+
+PatientMapper --> Patient
+PatientMapper --> CreatePatientRequest
+PatientMapper --> UpdatePatientRequest
+PatientMapper --> PatientResponse
+
+PatientRepository --> Patient
+
+PatientController --> CreatePatientRequest
+PatientController --> UpdatePatientRequest
+PatientController --> PatientResponse
+
+PatientController --> SecurityConfig
+PatientController --> OpenApiConfig
+
+@enduml
