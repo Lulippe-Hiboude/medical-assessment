@@ -1,0 +1,51 @@
+spring:
+  application:
+    name: patient-ms
+  main:
+    banner-mode: console
+  banner:
+    charset: UTF-8
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    database: postgresql
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        default_schema: patients
+    open-in-view: false
+
+  sql:
+    init:
+      platform: postgres
+
+  liquibase:
+    enabled: true
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+    default-schema: patients
+    contexts: dev
+
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+logging:
+  level:
+    root: ERROR
+    com.medical.assessment.patientms: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
