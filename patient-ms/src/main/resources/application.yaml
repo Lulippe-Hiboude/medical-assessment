@@ -55,11 +55,4 @@ logging:
       boot:
         autoconfigure:
           postgresql: INFO
-    org:
-      springframework:
-        boot:
-          web:
-            tomcat : INFO
-          autoconfigure:
-            liquibase: TRACE
-    liquibase: INFO
+    liquibase: ERROR

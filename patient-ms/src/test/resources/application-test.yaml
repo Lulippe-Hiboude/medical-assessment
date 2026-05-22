@@ -14,3 +14,4 @@ spring:
     enabled: true
     contexts: test
     default-schema: patients
+    drop-first: true
