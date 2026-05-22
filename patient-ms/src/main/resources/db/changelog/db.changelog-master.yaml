@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/changelog-2026-22-05-create-patient-and-address-tables.sql
+      context: local,test
