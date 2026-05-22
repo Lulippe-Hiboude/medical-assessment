@@ -1,6 +1,12 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
 spring:
   application:
     name: patient-ms
+
   main:
     banner-mode: console
   banner:
@@ -15,27 +21,21 @@ spring:
   jpa:
     database: postgresql
     show-sql: true
-    hibernate:
-      ddl-auto: update
     properties:
       hibernate:
         default_schema: patients
-    open-in-view: false
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    default-schema: patients
+    contexts: local
 
   sql:
     init:
       platform: postgres
 
-  liquibase:
-    enabled: true
-    change-log: classpath:/db/changelog/db.changelog-master.yaml
-    default-schema: patients
-    contexts: dev
 
-server:
-  port: 8080
-  servlet:
-    context-path: /
 
 springdoc:
   api-docs:
@@ -49,3 +49,17 @@ logging:
     com.medical.assessment.patientms: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.orm.jdbc.bind: TRACE
+    org.springframework.boot.autoconfigure.liquibase: TRACE
+    org.springframework.jdbc: DEBUG
+    springframework:
+      boot:
+        autoconfigure:
+          postgresql: INFO
+    org:
+      springframework:
+        boot:
+          web:
+            tomcat : INFO
+          autoconfigure:
+            liquibase: TRACE
+    liquibase: INFO
