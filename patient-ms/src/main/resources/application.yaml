@@ -55,4 +55,6 @@ logging:
       boot:
         autoconfigure:
           postgresql: INFO
-    liquibase: ERROR
+    liquibase: TRACE
+
+    org.springframework.core.env: TRACE

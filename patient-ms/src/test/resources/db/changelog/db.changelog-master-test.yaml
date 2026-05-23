@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/changelog-2026-05-22-create-patient-table-test.sql
+      context: test
