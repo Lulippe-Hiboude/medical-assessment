@@ -16,8 +16,13 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>patient-ms</name>
 
-    <dependencies>
+    <properties>
+        <jjwt.version>0.13.0</jjwt.version>
+        <openapi-generator-plugin.version>7.8.0</openapi-generator-plugin.version>
+        <jackson-databind-nullable.version>0.2.6</jackson-databind-nullable.version>
+    </properties>
 
+    <dependencies>
         <!-- WEB -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -36,10 +41,30 @@
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
+        <!-- JJWT -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>${jjwt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>${jjwt.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>${jjwt.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
         <!-- LIQUIBASE  -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-liquibase</artifactId>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+            <version>4.31.1</version>
         </dependency>
 
         <!-- POSTGRES DRIVER -->
@@ -81,7 +106,17 @@
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>${openapi.version}</version>
         </dependency>
-
+        <!--OpenApi-->
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>openapi-generator</artifactId>
+            <version>${openapi-generator-plugin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>jackson-databind-nullable</artifactId>
+            <version>${jackson-databind-nullable.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -108,7 +143,70 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
 
+            <!-- SUREFIRE & JACOCO -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+
+                <configuration>
+                    <excludes>
+                        <exclude>**/authentification/api/**</exclude>
+                        <exclude>**/authentification/model/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <!-- OPEN API -->
+            <plugin>
+                    <groupId>org.openapitools</groupId>
+                    <artifactId>openapi-generator-maven-plugin</artifactId>
+                    <version>${openapi-generator-plugin.version}</version>
+
+                    <executions>
+                        <execution>
+
+                            <goals>
+                                <goal>generate</goal>
+                            </goals>
+
+                            <configuration>
+                                <inputSpec>
+                                    ${project.basedir}/src/main/resources/static/openapi/patient-ms-authentification-api.yaml
+                                </inputSpec>
+
+                                <apiPackage>com.medical.assessment.patientms.authentification.api</apiPackage>
+                                <modelPackage>com.medical.assessment.patientms.authentification.model</modelPackage>
+
+                                <generatorName>spring</generatorName>
+
+                                <generateModelTests>false</generateModelTests>
+                                <generateModelDocumentation>false</generateModelDocumentation>
+                                <generateApiTests>false</generateApiTests>
+                                <generateSupportingFiles>false</generateSupportingFiles>
+
+                                <configOptions>
+                                    <useTags>true</useTags>
+                                    <useSpringBoot3>true</useSpringBoot3>
+                                    <skipDefaultInterface>true</skipDefaultInterface>
+                                    <interfaceOnly>true</interfaceOnly>
+                                    <returnResponse>true</returnResponse>
+                                </configOptions>
+
+                                <additionalProperties>
+                                    <additionalProperty>
+                                        removeEnumValuePrefix=false
+                                    </additionalProperty>
+                                </additionalProperties>
+
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
         </plugins>
     </build>
-
 </project>

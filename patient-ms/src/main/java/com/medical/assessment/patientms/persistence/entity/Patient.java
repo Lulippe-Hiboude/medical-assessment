@@ -17,7 +17,7 @@ public class Patient {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
-    @Column(name = "patient_id",nullable = false)
+    @Column(name = "patient_id", nullable = false)
     private Long patientId;
 
     @Column(name = "last_name", nullable = false, length = 100)
