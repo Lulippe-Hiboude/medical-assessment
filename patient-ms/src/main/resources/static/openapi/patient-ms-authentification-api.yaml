@@ -1,0 +1,68 @@
+openapi: 3.0.3
+info:
+  title: Patient MS Authentification API
+  description: Patient MS Authentification API
+  version: 1.0.0
+
+servers:
+  - url: "/"
+    description: "Current"
+  - url: "http://localhost:8080"
+    description: "localhost"
+
+tags:
+  - name: authentification
+    description: Everything for patient MS about authentification
+
+paths:
+  /auth/token:
+    get:
+      tags:
+        - authentification
+      summary: Get a JWT token for a user
+      operationId: getAuthToken
+
+      parameters:
+        - in: query
+          name: username
+          required: true
+          description: the username of the user
+          schema:
+            type: string
+
+        - in: query
+          name: role
+          required: true
+          description: the role of the user
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: JWT token generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokenResponse'
+        '400':
+          description: Invalid input
+          content:
+            text/plain:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized - invalid username or role
+          content:
+            text/plain:
+              schema:
+                type: string
+components:
+  schemas:
+    AuthTokenResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: The generated JWT token
+          example: "eyJhbGciOiJIUz"
+  

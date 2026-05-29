@@ -35,13 +35,15 @@ spring:
     init:
       platform: postgres
 
-
-
 springdoc:
   api-docs:
     enabled: true
   swagger-ui:
     enabled: true
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 3600000
 
 logging:
   level:
@@ -56,5 +58,4 @@ logging:
         autoconfigure:
           postgresql: INFO
     liquibase: TRACE
-
     org.springframework.core.env: TRACE
