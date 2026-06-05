@@ -20,6 +20,7 @@
         <jjwt.version>0.13.0</jjwt.version>
         <openapi-generator-plugin.version>7.8.0</openapi-generator-plugin.version>
         <jackson-databind-nullable.version>0.2.6</jackson-databind-nullable.version>
+        <mapstruct.version>1.6.3</mapstruct.version>
     </properties>
 
     <dependencies>
@@ -100,22 +101,41 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- OPENAPI -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>${openapi.version}</version>
         </dependency>
-        <!--OpenApi-->
+
         <dependency>
             <groupId>org.openapitools</groupId>
             <artifactId>openapi-generator</artifactId>
             <version>${openapi-generator-plugin.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.openapitools</groupId>
             <artifactId>jackson-databind-nullable</artifactId>
             <version>${jackson-databind-nullable.version}</version>
+        </dependency>
+
+        <!--MapStruct-->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+            <version>${mapstruct.version}</version>
         </dependency>
     </dependencies>
 
@@ -133,7 +153,14 @@
                             <artifactId>lombok</artifactId>
                             <version>${lombok.version}</version>
                         </path>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
+                        </path>
                     </annotationProcessorPaths>
+                    <source>16</source>
+                    <target>16</target>
                 </configuration>
             </plugin>
 
@@ -157,6 +184,8 @@
                     <excludes>
                         <exclude>**/authentification/api/**</exclude>
                         <exclude>**/authentification/model/**</exclude>
+                        <exclude>**/patient/api/**</exclude>
+                        <exclude>**/patient/model/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>
@@ -169,7 +198,7 @@
 
                     <executions>
                         <execution>
-
+                            <id>authenticate</id>
                             <goals>
                                 <goal>generate</goal>
                             </goals>
@@ -205,6 +234,45 @@
 
                             </configuration>
                         </execution>
+
+                        <execution>
+                            <id>patient</id>
+                            <goals>
+                                <goal>generate</goal>
+                            </goals>
+
+                            <configuration>
+                                <inputSpec>
+                                    ${project.basedir}/src/main/resources/static/openapi/patient-ms-patient-api.yaml
+                                </inputSpec>
+
+                                <apiPackage>com.medical.assessment.patientms.patient.api</apiPackage>
+                                <modelPackage>com.medical.assessment.patientms.patient.model</modelPackage>
+
+                                <generatorName>spring</generatorName>
+
+                                <generateModelTests>false</generateModelTests>
+                                <generateModelDocumentation>false</generateModelDocumentation>
+                                <generateApiTests>false</generateApiTests>
+                                <generateSupportingFiles>false</generateSupportingFiles>
+
+                                <configOptions>
+                                    <useTags>true</useTags>
+                                    <useSpringBoot3>true</useSpringBoot3>
+                                    <skipDefaultInterface>true</skipDefaultInterface>
+                                    <interfaceOnly>true</interfaceOnly>
+                                    <returnResponse>true</returnResponse>
+                                </configOptions>
+
+                                <additionalProperties>
+                                    <additionalProperty>
+                                        removeEnumValuePrefix=false
+                                    </additionalProperty>
+                                </additionalProperties>
+
+                            </configuration>
+                        </execution>
+
                     </executions>
                 </plugin>
         </plugins>

@@ -86,6 +86,7 @@
                                 <goal>report</goal>
                             </goals>
                         </execution>
+                        <!-- to check for 80% code coverage -->
                         <execution>
                             <id>jacoco-check</id>
                             <phase>verify</phase>
