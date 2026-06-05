@@ -7,14 +7,19 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.crypto.SecretKey;
+import java.time.Clock;
+import java.time.Instant;
 import java.util.Base64;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class JwtServiceTest {
@@ -83,10 +88,9 @@ class JwtServiceTest {
         //given
         final String username = "user1";
         final String role = "INVALID_ROLE";
-        final String token = jwtService.generateToken(username, role);
 
         //when
-        final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> jwtService.extractRole(token));
+        final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> jwtService.generateToken(username,role));
 
         //then
         assertEquals("Invalid role value: " + role, exception.getMessage());
@@ -98,13 +102,25 @@ class JwtServiceTest {
         //given
         final String username = "user1";
         final String role = " ";
-        final String token = jwtService.generateToken(username, role);
 
         //when
-        final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> jwtService.extractRole(token));
+        final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> jwtService.generateToken(username,role));
 
         //then
         assertEquals("Role is missing in the token", exception.getMessage());
     }
 
+    @Test
+    @DisplayName("should throw IllegalArgumentException if username is missing")
+    void should_throw_IllegalArgumentException_if_username_is_missing() {
+        //given
+        final String username = " ";
+        final String role = "DOCTOR";
+
+        //when
+        final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> jwtService.generateToken(username,role));
+
+        //then
+        assertEquals("Username cannot be blank", exception.getMessage());
+    }
 }

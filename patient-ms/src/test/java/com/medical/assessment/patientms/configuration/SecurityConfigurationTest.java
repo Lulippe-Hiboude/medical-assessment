@@ -1,14 +1,20 @@
 package com.medical.assessment.patientms.configuration;
 
 import com.medical.assessment.patientms.security.jwt.JwtService;
+import io.jsonwebtoken.Jwts;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
+
+import javax.crypto.SecretKey;
+import java.time.Instant;
+import java.util.Base64;
+import java.util.Date;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -18,10 +24,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class SecurityConfigurationTest {
+    private static final long EXPIREDDATE = -1L;
     @Autowired
     private MockMvc mockMvc;
 
-    @MockitoBean
+    @Autowired
     private JwtService jwtService;
 
     @Test
@@ -32,5 +39,48 @@ class SecurityConfigurationTest {
                         .param("username", "test")
                         .param("role", "DOCTOR"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("should_deny_access_to_protected_endpoint_without_token")
+    void should_deny_access_to_protected_endpoint_without_token() throws Exception {
+        //when & then
+        mockMvc.perform(get("/patient/1"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("should_allow_access_to_protected_endpoint_with_valid_token")
+    void should_allow_access_to_protected_endpoint_with_valid_token() throws Exception {
+        // given
+        final String token = jwtService.generateToken("test", "DOCTOR");
+
+
+        // when & then
+        mockMvc.perform(get("/patient/{id}", 1L)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("should_fail_when_token_is_expired")
+    void should_fail_when_token_is_expired() throws Exception {
+        // GIVEN
+        final SecretKey key = Jwts.SIG.HS256.key().build();
+
+        final Instant now = Instant.now();
+
+        final String expiredToken = Jwts.builder()
+                .subject("test")
+                .claim("role", "DOCTOR")
+                .issuedAt(Date.from(now.minusSeconds(3600)))
+                .expiration(Date.from(now.minusSeconds(1800)))
+                .signWith(key)
+                .compact();
+
+        // WHEN & THEN
+        mockMvc.perform(get("/patient/{id}", 1L)
+                        .header("Authorization", "Bearer " + expiredToken))
+                .andExpect(status().isUnauthorized());
     }
 }

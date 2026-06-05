@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
+import java.time.LocalDate;
 
 @Builder
 @Data
@@ -27,7 +28,7 @@ public class Patient {
     private String firstName;
 
     @Column(name = "birth_date", nullable = false)
-    private Instant birthDate;
+    private LocalDate birthDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "gender", nullable = false, length = 10)

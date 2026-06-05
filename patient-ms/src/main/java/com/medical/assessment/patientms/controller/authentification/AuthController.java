@@ -3,7 +3,9 @@ package com.medical.assessment.patientms.controller.authentification;
 import com.medical.assessment.patientms.authentification.api.AuthentificationApi;
 import com.medical.assessment.patientms.authentification.model.AuthTokenResponse;
 import com.medical.assessment.patientms.security.jwt.JwtService;
+import com.medical.assessment.patientms.security.jwt.enums.Role;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,11 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class AuthController implements AuthentificationApi {
     private final JwtService jwtService;
 
     @Override
     public ResponseEntity<AuthTokenResponse> getAuthToken(final String username, final String role) {
+        log.info("getting auth token for user {} with role {}", username, role);
         final String token = jwtService.generateToken(username, role);
         final AuthTokenResponse authTokenResponse = new AuthTokenResponse();
         authTokenResponse.setToken(token);

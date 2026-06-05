@@ -1,0 +1,84 @@
+openapi: 3.0.3
+info:
+  title: Patient MS Patient API
+  description: Patient MS Patient API
+  version: 1.0.0
+
+servers:
+  - url: "/"
+    description: "Current"
+  - url: "http://localhost:8080"
+    description: "localhost"
+
+tags:
+  - name: patients
+    description: Everything for patient MS about patient
+
+paths:
+  /patient/{id}:
+    get:
+      tags:
+        - patient
+      summary: get a patient by id
+      operationId: getPatientById
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: the id of the patient being queried
+          schema:
+              type: integer
+              format: int64
+              minimum: 1
+      responses:
+        '200':
+          description: patient found for the given id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientDto'
+        '400':
+          description: Invalid input
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: Not found - no patient found for the given id
+          content:
+            text/plain:
+              schema:
+                type: string
+components:
+  schemas:
+    PatientDto:
+      type: object
+      properties:
+        firstName:
+          type: string
+          description: "the first name of the patient"
+          example: "John"
+        lastName:
+          type: string
+          description: "the last name of the patient"
+          example: "Doe"
+        birthDate:
+          type: string
+          format: date
+          description: "the birth date of the patient in format yyyy-MM-dd"
+          example: "1980-01-01"
+        gender:
+          type: string
+          enum: ["M", "F"]
+          description: the gender of the patient
+          example: "M"
+        address:
+          type: string
+          description: "the address of the patient"
+          example: "1 High Street"
+        phoneNumber:
+          type: string
+          description: "the phone number of the patient"
+          example: "0123456789"
+
+

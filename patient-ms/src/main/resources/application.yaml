@@ -2,7 +2,9 @@ server:
   port: 8080
   servlet:
     context-path: /
-
+application:
+  title: Patient Management System
+  version: 1.0.0
 spring:
   application:
     name: patient-ms
@@ -11,6 +13,7 @@ spring:
     banner-mode: console
   banner:
     charset: UTF-8
+    location: banner.txt
 
   datasource:
     driver-class-name: org.postgresql.Driver
@@ -49,13 +52,4 @@ logging:
   level:
     root: ERROR
     com.medical.assessment.patientms: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.orm.jdbc.bind: TRACE
-    org.springframework.boot.autoconfigure.liquibase: TRACE
     org.springframework.jdbc: DEBUG
-    springframework:
-      boot:
-        autoconfigure:
-          postgresql: INFO
-    liquibase: TRACE
-    org.springframework.core.env: TRACE

@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,6 +20,7 @@ import static java.util.Collections.singletonList;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
 
@@ -41,6 +43,7 @@ public class JwtFilter extends OncePerRequestFilter {
             authenticateFromToken(token);
             filterChain.doFilter(request, response);
         } catch (final Exception e) {
+            log.error("JWT error", e);
             SecurityContextHolder.clearContext();
             filterChain.doFilter(request, response);
         }

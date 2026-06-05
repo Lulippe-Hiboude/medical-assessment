@@ -5,10 +5,13 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.time.Clock;
+import java.time.Instant;
 import java.util.Date;
 
 import static io.jsonwebtoken.security.Keys.hmacShaKeyFor;
@@ -33,11 +36,19 @@ public class JwtService {
     }
 
     public String generateToken(final String username, final String role) {
+        final Role validRole = Role.fromValue(role);
+
+        if(StringUtils.isBlank(username)) {
+            throw new IllegalArgumentException("Username cannot be blank");
+        }
+
+        final Date now = new Date();
+        final Date expiration = new Date(now.getTime() + expirationDate);
         return Jwts.builder()
                 .subject(username)
-                .claim("role", role)
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + expirationDate))
+                .claim("role", validRole.name())
+                .issuedAt(now)
+                .expiration(expiration)
                 .signWith(getSignKey(secretKey))
                 .compact();
     }
@@ -54,6 +65,4 @@ public class JwtService {
         final byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return hmacShaKeyFor(keyBytes);
     }
-
-
 }
