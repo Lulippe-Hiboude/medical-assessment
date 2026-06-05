@@ -11,6 +11,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @Validated
 @RestController
 @RequiredArgsConstructor
@@ -23,5 +25,12 @@ public class PatientController implements PatientApi {
         log.info("get patient id");
         final PatientDto patientDto = patientService.getPatientById(id);
         return ResponseEntity.ok(patientDto);
+    }
+
+    @Override
+    public ResponseEntity<List<PatientDto>> getAllPatients() {
+        log.info("get all patients");
+        final List<PatientDto> patientDtos = patientService.getAllPatients();
+        return ResponseEntity.ok(patientDtos);
     }
 }

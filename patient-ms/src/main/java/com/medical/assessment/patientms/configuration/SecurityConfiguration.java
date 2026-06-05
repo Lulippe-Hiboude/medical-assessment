@@ -43,7 +43,11 @@ public class SecurityConfiguration {
                         .permitAll()
 
                         .requestMatchers(
-                                HttpMethod.GET, "/patient/**")
+                                HttpMethod.GET, "/patient")
+                        .hasRole("ORGANIZER")
+
+                        .requestMatchers(
+                                HttpMethod.GET, "/patient/*")
                         .hasAnyRole("ORGANIZER", "DOCTOR")
 
                         .anyRequest()

@@ -15,6 +15,25 @@ tags:
     description: Everything for patient MS about patient
 
 paths:
+  /patient:
+    get:
+      tags:
+        - patient
+      summary: get all patients
+      operationId: getAllPatients
+      responses:
+        '200':
+          description: list of patients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PatientDto'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
   /patient/{id}:
     get:
       tags:

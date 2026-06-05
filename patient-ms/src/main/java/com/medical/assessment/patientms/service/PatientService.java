@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 import static java.util.Optional.ofNullable;
 
 @Service
@@ -23,5 +25,13 @@ public class PatientService {
                 .orElseThrow(()-> new IllegalArgumentException("Patient id must not be null"))
                 .map(PatientMapper.INSTANCE::toPatientDto)
                 .orElseThrow(() -> new PatientNotFoundException("Patient with id " + id + " not found"));
+    }
+
+    public List<PatientDto> getAllPatients() {
+        log.debug("Getting all patients");
+        return patientRepository.findAll()
+                .stream()
+                .map(PatientMapper.INSTANCE::toPatientDto)
+                .toList();
     }
 }

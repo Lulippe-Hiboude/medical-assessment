@@ -5,8 +5,8 @@ import com.medical.assessment.patientms.exception.PatientNotFoundException;
 import com.medical.assessment.patientms.patient.model.PatientDto;
 import com.medical.assessment.patientms.security.jwt.JwtService;
 import com.medical.assessment.patientms.service.PatientService;
-import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -16,13 +16,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = PatientController.class)
@@ -39,72 +37,118 @@ class PatientControllerTest {
     @MockitoBean
     private JwtService jwtService;
 
-    @Test
-    @DisplayName("should get patient by id")
-    @WithMockUser(username = "doctor", roles = "DOCTOR")
-    void shouldGetPatientById() throws Exception {
-        //given
-        final Long id = 1L;
-        final PatientDto patientDto = getPatientDto();
-        given(patientService.getPatientById(id)).willReturn(patientDto);
+    @Nested
+    @DisplayName("getAllPatients")
+    class getAllPatients {
+        @Test
+        @DisplayName("should get all patients")
+        @WithMockUser(username = "organizer", roles = "ORGANIZER")
+        void shouldGetAllPatients() throws Exception {
+            //given
+            final PatientDto patientDto1 = getPatientDto();
+            final PatientDto patientDto2 = getPatientDto();
+            given(patientService.getAllPatients()).willReturn(List.of(patientDto1, patientDto2));
 
-        //when
-        final MvcResult result = mockMvc.perform(get("/patient/{id}", id))
-                .andExpect(status().isOk())
-                .andReturn();
+            //when
+            final MvcResult result = mockMvc.perform(get("/patient"))
+                    .andExpect(status().isOk())
+                    .andReturn();
 
-        //then
-        final String responseBody = result.getResponse().getContentAsString();
-        final String expectedResponseBody = objectMapper.writeValueAsString(patientDto);
-        assertThat(responseBody).isEqualTo(expectedResponseBody);
+            //then
+            final String responseBody = result.getResponse().getContentAsString();
+            final String expectedResponseBody = objectMapper.writeValueAsString(List.of(patientDto1, patientDto2));
+            assertThat(responseBody).isEqualTo(expectedResponseBody);
+        }
 
+        @Test
+        @DisplayName("should return empty list when no patients found")
+        @WithMockUser(username = "organizer", roles = "ORGANIZER")
+        void shouldReturnEmptyListWhenNoPatientsFound() throws Exception {
+            //given
+            given(patientService.getAllPatients()).willReturn(List.of());
+
+            //when
+            final MvcResult result = mockMvc.perform(get("/patient"))
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+            //then
+            final String responseBody = result.getResponse().getContentAsString();
+            final String expectedResponseBody = objectMapper.writeValueAsString(List.of());
+            assertThat(responseBody).isEqualTo(expectedResponseBody);
+        }
     }
 
-    @Test
-    @DisplayName("should return NOT_FOUND when patient not found")
-    @WithMockUser(username = "doctor", roles = "DOCTOR")
-    void shouldReturnNotFoundWhenPatientNotFound() throws Exception {
-        //given
-        final Long id = 1L;
-        given(patientService.getPatientById(id)).willThrow(new PatientNotFoundException("Patient not found with id: " + id));
+    @Nested
+    @DisplayName("getPatientById")
+    class getPatientById {
+        @Test
+        @DisplayName("should get patient by id")
+        @WithMockUser(username = "doctor", roles = "DOCTOR")
+        void shouldGetPatientById() throws Exception {
+            //given
+            final Long id = 1L;
+            final PatientDto patientDto = getPatientDto();
+            given(patientService.getPatientById(id)).willReturn(patientDto);
 
-        //when & then
-        mockMvc.perform(get("/patient/{id}", id))
-                .andExpect(status().isNotFound());
+            //when
+            final MvcResult result = mockMvc.perform(get("/patient/{id}", id))
+                    .andExpect(status().isOk())
+                    .andReturn();
 
-    }
+            //then
+            final String responseBody = result.getResponse().getContentAsString();
+            final String expectedResponseBody = objectMapper.writeValueAsString(patientDto);
+            assertThat(responseBody).isEqualTo(expectedResponseBody);
 
-    @Test
-    @WithMockUser(username = "user", roles = "DOCTOR")
-    void shouldReturnBadRequestWhenInvalidId() throws Exception {
-        //given
-        final String invalidId = "abc";
+        }
 
-        //when & then
-        mockMvc.perform(get("/patient/{id}", invalidId))
-                .andExpect(status().isBadRequest());
-    }
+        @Test
+        @DisplayName("should return NOT_FOUND when patient not found")
+        @WithMockUser(username = "doctor", roles = "DOCTOR")
+        void shouldReturnNotFoundWhenPatientNotFound() throws Exception {
+            //given
+            final Long id = 1L;
+            given(patientService.getPatientById(id)).willThrow(new PatientNotFoundException("Patient not found with id: " + id));
 
-    @Test
-    @WithMockUser(username = "user", roles = "DOCTOR")
-    void shouldReturnBadRequestWhenIdIsZero() throws Exception {
-        //given
-        final Long invalidId = 0L;
+            //when & then
+            mockMvc.perform(get("/patient/{id}", id))
+                    .andExpect(status().isNotFound());
 
-        //when & then
-        mockMvc.perform(get("/patient/{id}", invalidId))
-                .andExpect(status().isBadRequest());
-    }
+        }
 
-    @Test
-    @WithMockUser(username = "user", roles = "DOCTOR")
-    void shouldReturnBadRequestWhenIdIsNegative() throws Exception {
-        //given
-        final Long invalidId = -1L;
+        @Test
+        @WithMockUser(username = "user", roles = "DOCTOR")
+        void shouldReturnBadRequestWhenInvalidId() throws Exception {
+            //given
+            final String invalidId = "abc";
 
-        //when & then
-        mockMvc.perform(get("/patient/{id}", invalidId))
-                .andExpect(status().isBadRequest());
+            //when & then
+            mockMvc.perform(get("/patient/{id}", invalidId))
+                    .andExpect(status().isBadRequest());
+        }
+
+        @Test
+        @WithMockUser(username = "user", roles = "DOCTOR")
+        void shouldReturnBadRequestWhenIdIsZero() throws Exception {
+            //given
+            final Long invalidId = 0L;
+
+            //when & then
+            mockMvc.perform(get("/patient/{id}", invalidId))
+                    .andExpect(status().isBadRequest());
+        }
+
+        @Test
+        @WithMockUser(username = "user", roles = "DOCTOR")
+        void shouldReturnBadRequestWhenIdIsNegative() throws Exception {
+            //given
+            final Long invalidId = -1L;
+
+            //when & then
+            mockMvc.perform(get("/patient/{id}", invalidId))
+                    .andExpect(status().isBadRequest());
+        }
     }
 
     private static PatientDto getPatientDto() {

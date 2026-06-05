@@ -8,12 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 
 import javax.crypto.SecretKey;
 import java.time.Instant;
-import java.util.Base64;
 import java.util.Date;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -24,7 +22,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class SecurityConfigurationTest {
-    private static final long EXPIREDDATE = -1L;
     @Autowired
     private MockMvc mockMvc;
 
@@ -82,5 +79,17 @@ class SecurityConfigurationTest {
         mockMvc.perform(get("/patient/{id}", 1L)
                         .header("Authorization", "Bearer " + expiredToken))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("should deny access to unauthorized role")
+    void should_deny_access_to_unauthorized_role() throws Exception {
+        // given
+        final String token = jwtService.generateToken("test", "DOCTOR");
+
+        // when & then
+        mockMvc.perform(get("/patient")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isForbidden());
     }
 }
