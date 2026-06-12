@@ -50,6 +50,10 @@ public class SecurityConfiguration {
                                 HttpMethod.GET, "/patient/*")
                         .hasAnyRole("ORGANIZER", "DOCTOR")
 
+                        .requestMatchers(
+                                HttpMethod.POST, "/patient/**")
+                        .permitAll()
+
                         .anyRequest()
                         .authenticated()
                 )

@@ -62,7 +62,7 @@ class SecurityConfigurationTest {
     @Test
     @DisplayName("should_fail_when_token_is_expired")
     void should_fail_when_token_is_expired() throws Exception {
-        // GIVEN
+        // given
         final SecretKey key = Jwts.SIG.HS256.key().build();
 
         final Instant now = Instant.now();
@@ -75,7 +75,7 @@ class SecurityConfigurationTest {
                 .signWith(key)
                 .compact();
 
-        // WHEN & THEN
+        // when& then
         mockMvc.perform(get("/patient/{id}", 1L)
                         .header("Authorization", "Bearer " + expiredToken))
                 .andExpect(status().isUnauthorized());

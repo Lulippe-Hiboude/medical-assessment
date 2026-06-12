@@ -53,3 +53,4 @@ logging:
     root: ERROR
     com.medical.assessment.patientms: DEBUG
     org.springframework.jdbc: DEBUG
+    org.springframework.security: TRACE
