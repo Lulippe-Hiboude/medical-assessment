@@ -1,10 +1,12 @@
 package com.medical.assessment.patientms.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.medical.assessment.patientms.patient.model.PatientCreateDto;
 import com.medical.assessment.patientms.patient.model.PatientDto;
+import com.medical.assessment.patientms.persistence.entity.Patient;
 import com.medical.assessment.patientms.persistence.repository.PatientRepository;
 import com.medical.assessment.patientms.security.jwt.JwtService;
-import com.medical.assessment.patientms.service.PatientService;
+import com.medical.assessment.patientms.service.PatientServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,8 +18,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -38,7 +45,7 @@ public class PatientControllerIT {
     private PatientRepository patientRepository;
 
     @Autowired
-    private PatientService patientService;
+    private PatientServiceImpl patientServiceImpl;
 
     @Autowired
     private JwtService jwtService;
@@ -49,7 +56,7 @@ public class PatientControllerIT {
         //given
         final String token = jwtService.generateToken("doctor", "DOCTOR");
         final Long id = 1L;
-        final PatientDto patientDto = patientService.getPatientById(id);
+        final PatientDto patientDto = patientServiceImpl.getPatientById(id);
 
         //when
         final MvcResult result = mockMvc.perform(get("/patient/{id}", id)
@@ -78,8 +85,76 @@ public class PatientControllerIT {
 
         //then
         final String responseBody = result.getResponse().getContentAsString();
-        final String expectedResponseBody = objectMapper.writeValueAsString(patientService.getAllPatients());
+        final String expectedResponseBody = objectMapper.writeValueAsString(patientServiceImpl.getAllPatients());
         assertThat(responseBody).isNotNull();
         assertThat(responseBody).isEqualTo(expectedResponseBody);
+    }
+
+    @Test
+    @DisplayName("should create patient")
+    void shouldCreatePatient() throws Exception {
+        //given
+        final String token = jwtService.generateToken("organizer", "ORGANIZER");
+        final String firstName = "Jane";
+        final String lastName = "Doe";
+        final LocalDate birthDate = LocalDate.of(1995, 1, 1);
+        final PatientCreateDto.GenderEnum gender = PatientCreateDto.GenderEnum.F;
+        final String address = "123 Main St";
+        final String phoneNumber = "0123456789";
+
+        final PatientCreateDto patientCreateDto = getPatientCreateDto(firstName, lastName, birthDate, gender, address, phoneNumber);
+
+        final List<Patient> patientsBefore = patientRepository.findAll();
+        assertThat(patientsBefore).isNotNull();
+        assertThat(patientsBefore.size()).isEqualTo(2);
+
+        //when
+        final MvcResult result = mockMvc.perform(post("/patient")
+                        .with(csrf())
+                        .header("Authorization", "Bearer " + token)
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(patientCreateDto))
+                ).andExpect(status().isOk())
+                .andReturn();
+
+        //then
+        final String responseBody = result.getResponse().getContentAsString();
+        final PatientDto patientDto = objectMapper.readValue(responseBody, PatientDto.class);
+        assertThat(patientDto).isNotNull();
+        assertThat(patientDto.getFirstName()).isEqualTo(patientCreateDto.getFirstName());
+        assertThat(patientDto.getLastName()).isEqualTo(patientCreateDto.getLastName());
+        assertThat(patientDto.getBirthDate()).isEqualTo(patientCreateDto.getBirthDate());
+        assertThat(patientDto.getGender().getValue()).isEqualTo(patientCreateDto.getGender().getValue());
+        assertThat(patientDto.getAddress()).isEqualTo(patientCreateDto.getAddress());
+        assertThat(patientDto.getPhoneNumber()).isEqualTo(patientCreateDto.getPhoneNumber());
+
+        final List<Patient> patients = patientRepository.findAll();
+        assertThat(patients).isNotNull();
+        assertThat(patients.size()).isEqualTo(3);
+
+        final Patient patient = patients.get(2);
+        assertThat(patient.getFirstName()).isEqualTo(patientCreateDto.getFirstName());
+        assertThat(patient.getLastName()).isEqualTo(patientCreateDto.getLastName());
+        assertThat(patient.getBirthDate()).isEqualTo(patientCreateDto.getBirthDate());
+        assertThat(patient.getGender().getValue()).isEqualTo(patientCreateDto.getGender().getValue());
+        assertThat(patient.getAddress()).isEqualTo(patientCreateDto.getAddress());
+        assertThat(patient.getPhoneNumber()).isEqualTo(patientCreateDto.getPhoneNumber());
+    }
+
+    private static PatientCreateDto getPatientCreateDto(final String firstName,
+                                                        final String lastName,
+                                                        final LocalDate birthDate,
+                                                        final PatientCreateDto.GenderEnum gender,
+                                                        final String address,
+                                                        final String phoneNumber) {
+
+        final PatientCreateDto patientCreateDto = new PatientCreateDto();
+        patientCreateDto.setFirstName(firstName);
+        patientCreateDto.setLastName(lastName);
+        patientCreateDto.setBirthDate(birthDate);
+        patientCreateDto.setGender(gender);
+        patientCreateDto.setAddress(address);
+        patientCreateDto.setPhoneNumber(phoneNumber);
+        return patientCreateDto;
     }
 }

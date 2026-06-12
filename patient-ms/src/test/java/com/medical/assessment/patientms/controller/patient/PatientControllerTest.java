@@ -1,10 +1,12 @@
 package com.medical.assessment.patientms.controller.patient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.medical.assessment.patientms.exception.PatientAlreadyExistsException;
 import com.medical.assessment.patientms.exception.PatientNotFoundException;
+import com.medical.assessment.patientms.patient.model.PatientCreateDto;
 import com.medical.assessment.patientms.patient.model.PatientDto;
 import com.medical.assessment.patientms.security.jwt.JwtService;
-import com.medical.assessment.patientms.service.PatientService;
+import com.medical.assessment.patientms.service.PatientServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -20,7 +22,9 @@ import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = PatientController.class)
@@ -32,11 +36,14 @@ class PatientControllerTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private PatientService patientService;
+    private PatientServiceImpl patientServiceImpl;
 
     @MockitoBean
     private JwtService jwtService;
 
+    // =========================
+    // GET ALL PATIENTS
+    // =========================
     @Nested
     @DisplayName("getAllPatients")
     class getAllPatients {
@@ -47,7 +54,7 @@ class PatientControllerTest {
             //given
             final PatientDto patientDto1 = getPatientDto();
             final PatientDto patientDto2 = getPatientDto();
-            given(patientService.getAllPatients()).willReturn(List.of(patientDto1, patientDto2));
+            given(patientServiceImpl.getAllPatients()).willReturn(List.of(patientDto1, patientDto2));
 
             //when
             final MvcResult result = mockMvc.perform(get("/patient"))
@@ -65,7 +72,7 @@ class PatientControllerTest {
         @WithMockUser(username = "organizer", roles = "ORGANIZER")
         void shouldReturnEmptyListWhenNoPatientsFound() throws Exception {
             //given
-            given(patientService.getAllPatients()).willReturn(List.of());
+            given(patientServiceImpl.getAllPatients()).willReturn(List.of());
 
             //when
             final MvcResult result = mockMvc.perform(get("/patient"))
@@ -79,6 +86,9 @@ class PatientControllerTest {
         }
     }
 
+    // =========================
+    // GET PATIENT BY ID
+    // =========================
     @Nested
     @DisplayName("getPatientById")
     class getPatientById {
@@ -89,7 +99,7 @@ class PatientControllerTest {
             //given
             final Long id = 1L;
             final PatientDto patientDto = getPatientDto();
-            given(patientService.getPatientById(id)).willReturn(patientDto);
+            given(patientServiceImpl.getPatientById(id)).willReturn(patientDto);
 
             //when
             final MvcResult result = mockMvc.perform(get("/patient/{id}", id))
@@ -109,7 +119,7 @@ class PatientControllerTest {
         void shouldReturnNotFoundWhenPatientNotFound() throws Exception {
             //given
             final Long id = 1L;
-            given(patientService.getPatientById(id)).willThrow(new PatientNotFoundException("Patient not found with id: " + id));
+            given(patientServiceImpl.getPatientById(id)).willThrow(new PatientNotFoundException("Patient not found with id: " + id));
 
             //when & then
             mockMvc.perform(get("/patient/{id}", id))
@@ -151,14 +161,125 @@ class PatientControllerTest {
         }
     }
 
+    // =========================
+    // CREATE PATIENT
+    // =========================
+    @Nested
+    @DisplayName("createPatient")
+    class createPatient {
+        @Test
+        @DisplayName("should create patient")
+        @WithMockUser(username = "organizer", roles = "ORGANIZER")
+        void shouldCreatePatient() throws Exception {
+            //given
+            final PatientCreateDto patientCreateDto = getPatientCreateDto();
+            final PatientDto patientDto = getPatientDto();
+            given(patientServiceImpl.createPatient(patientCreateDto)).willReturn(patientDto);
+
+            //when
+            final MvcResult result = mockMvc.perform(post("/patient")
+                            .with(csrf())
+                            .contentType("application/json")
+                            .content(objectMapper.writeValueAsString(patientCreateDto)))
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+
+            //then
+            final String responseBody = result.getResponse().getContentAsString();
+            final String expectedResponseBody = objectMapper.writeValueAsString(patientDto);
+            assertThat(responseBody).isEqualTo(expectedResponseBody);
+
+        }
+
+        @Test
+        @DisplayName("should return BAD_REQUEST when invalid patient data")
+        @WithMockUser(username = "organizer", roles = "ORGANIZER")
+        void shouldReturnBadRequestWhenInvalidPatientData() throws Exception {
+            //given
+            final PatientCreateDto invalidPatientCreateDto = new PatientCreateDto();
+            invalidPatientCreateDto.setFirstName(null);
+            invalidPatientCreateDto.setLastName(null);
+            invalidPatientCreateDto.setBirthDate(null);
+
+            //when
+            MvcResult result = mockMvc.perform(post("/patient")
+                            .with(csrf())
+                            .contentType("application/json")
+                            .content(objectMapper.writeValueAsString(invalidPatientCreateDto)))
+                    .andExpect(status().isBadRequest())
+                    .andReturn();
+
+            //then
+            final String responseBody = result.getResponse().getContentAsString();
+            assertThat(responseBody)
+                    .contains("firstName")
+                    .contains("First name is required");
+
+            assertThat(responseBody)
+                    .contains("lastName")
+                    .contains("Last name is required");
+
+            assertThat(responseBody)
+                    .contains("birthDate")
+                    .contains("Birthdate is mandatory");
+
+            assertThat(responseBody)
+                    .contains("gender")
+                    .contains("Gender is mandatory");
+        }
+
+        @Test
+        @DisplayName("should return BAD_REQUEST when future birthdate")
+        @WithMockUser(username = "organizer", roles = "ORGANIZER")
+        void shouldReturnBadRequestWhenFutureBirthdate() throws Exception {
+            //given
+            final PatientCreateDto invalidPatientCreateDto = getPatientCreateDto();
+            invalidPatientCreateDto.setBirthDate(LocalDate.now().plusDays(1));
+
+            //when
+            MvcResult result = mockMvc.perform(post("/patient")
+                            .with(csrf())
+                            .contentType("application/json")
+                            .content(objectMapper.writeValueAsString(invalidPatientCreateDto)))
+                    .andExpect(status().isBadRequest())
+                    .andReturn();
+
+            //then
+            final String responseBody = result.getResponse().getContentAsString();
+            assertThat(responseBody)
+                    .contains("birthDate")
+                    .contains("Birthdate must be a past date");
+        }
+
+        @Test
+        @DisplayName("should return CONFLICT when patient already exists")
+        @WithMockUser(username = "organizer", roles = "ORGANIZER")
+        void shouldReturnConflictWhenPatientAlreadyExists() throws Exception {
+            //given
+            final PatientCreateDto patientCreateDto = getPatientCreateDto();
+            given(patientServiceImpl.createPatient(patientCreateDto)).willThrow(new PatientAlreadyExistsException("Patient already exists"));
+
+            //when
+            MvcResult result = mockMvc.perform(post("/patient")
+                            .with(csrf())
+                            .contentType("application/json")
+                            .content(objectMapper.writeValueAsString(patientCreateDto)))
+                    .andExpect(status().isConflict())
+                    .andReturn();
+        }
+    }
+
     private static PatientDto getPatientDto() {
         final LocalDate dob = LocalDate.of(1995, 1, 1);
+        final Long id = 1L;
         final String firstName = "John";
         final String lastName = "Doe";
         final String address = "123 Main St";
         final String phoneNumber = "1234567890";
         final PatientDto.GenderEnum gender = PatientDto.GenderEnum.M;
         final PatientDto patientDto = new PatientDto();
+        patientDto.setId(id);
         patientDto.setFirstName(firstName);
         patientDto.setLastName(lastName);
         patientDto.setBirthDate(dob);
@@ -167,6 +288,25 @@ class PatientControllerTest {
         patientDto.setGender(gender);
 
         return patientDto;
+    }
+
+    private PatientCreateDto getPatientCreateDto() {
+        final String firstName = "John";
+        final String lastName = "Doe";
+        final LocalDate birthDate = LocalDate.of(1995, 1, 1);
+        final String address = "123 Main St";
+        final String phoneNumber = "1234567890";
+        final PatientCreateDto.GenderEnum gender = PatientCreateDto.GenderEnum.M;
+
+        final PatientCreateDto patientCreateDto = new PatientCreateDto();
+        patientCreateDto.setFirstName(firstName);
+        patientCreateDto.setLastName(lastName);
+        patientCreateDto.setGender(gender);
+        patientCreateDto.setBirthDate(birthDate);
+        patientCreateDto.setAddress(address);
+        patientCreateDto.setPhoneNumber(phoneNumber);
+
+        return patientCreateDto;
     }
 
 }

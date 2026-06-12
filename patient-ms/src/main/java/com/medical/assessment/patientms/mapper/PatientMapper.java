@@ -1,5 +1,6 @@
 package com.medical.assessment.patientms.mapper;
 
+import com.medical.assessment.patientms.patient.model.PatientCreateDto;
 import com.medical.assessment.patientms.patient.model.PatientDto;
 import com.medical.assessment.patientms.persistence.entity.Patient;
 import org.mapstruct.BeanMapping;
@@ -13,6 +14,7 @@ public interface PatientMapper {
     PatientMapper INSTANCE = Mappers.getMapper(PatientMapper.class);
 
     @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "id", source = "patientId")
     @Mapping(target = "firstName", source = "firstName")
     @Mapping(target = "lastName", source = "lastName")
     @Mapping(target = "birthDate", source = "birthDate")
@@ -20,4 +22,13 @@ public interface PatientMapper {
     @Mapping(target = "phoneNumber", source = "phoneNumber")
     @Mapping(target = "address", source = "address")
     PatientDto toPatientDto(final Patient patient);
+
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "firstName", source = "firstName")
+    @Mapping(target = "lastName", source = "lastName")
+    @Mapping(target = "birthDate", source = "birthDate")
+    @Mapping(target = "gender", source = "gender")
+    @Mapping(target = "phoneNumber", source = "phoneNumber")
+    @Mapping(target = "address", source = "address")
+    Patient toPatient(final PatientCreateDto patientCreateDto);
 }
