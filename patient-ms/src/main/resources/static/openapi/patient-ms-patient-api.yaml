@@ -55,10 +55,10 @@ paths:
 
         '400':
           description: Invalid input
-
+        '409':
+          description: conflict
         '401':
           description: Unauthorized
-
         '403':
           description: Forbidden
 
@@ -74,12 +74,51 @@ paths:
           required: true
           description: the id of the patient being queried
           schema:
-              type: integer
-              format: int64
-              minimum: 1
+            type: integer
+            format: int64
+            minimum: 1
       responses:
         '200':
           description: patient found for the given id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientDto'
+        '400':
+          description: Invalid input
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: Not found - no patient found for the given id
+          content:
+            text/plain:
+              schema:
+                type: string
+    patch:
+      tags:
+        - patient
+      summary: update partially a patient
+      operationId: updatePatient
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: the id of the patient being updated
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientUpdateDto'
+      responses:
+        '200':
+          description: patient updated
           content:
             application/json:
               schema:
@@ -158,12 +197,10 @@ components:
             @Past(message = "Birthdate must be a past date")
           example: "1980-01-01"
         gender:
-          type: string
-          enum: ["M", "F"]
-          description: the gender of the patient
+          allOf:
+            - $ref: '#/components/schemas/Gender'
           x-field-extra-annotation: |
             @NotNull(message = "Gender is mandatory")
-          example: "M"
         address:
           type: string
           description: "the address of the patient"
@@ -173,7 +210,48 @@ components:
           example: "1 High Street"
         phoneNumber:
           type: string
+          description: "the phone number of the patient in format xxx-xxx-xxxx"
+          x-field-extra-annotation: |
+            @Pattern(regexp = "^\\d{3}-\\d{3}-\\d{4}$",message = "Phone number must be in format xxx-xxx-xxxx")
+          example: "012-345-6789"
+    PatientUpdateDto:
+      type: object
+      properties:
+        firstName:
+          type: string
+          description: "the first name of the patient"
+          x-field-extra-annotation: |
+            @Size(max = 100, message = "First name must not exceed 100 characters")
+          example: "John"
+        lastName:
+          type: string
+          description: "the last name of the patient"
+          x-field-extra-annotation: |
+            @Size(max = 100, message = "Last name must not exceed 100 characters")
+          example: "Doe"
+        birthDate:
+          type: string
+          example: "1980-01-01"
+          format: date
+          description: "the birth date of the patient in format yyyy-MM-dd"
+          x-field-extra-annotation: |
+            @Past(message = "Birthdate must be a past date")
+        gender:
+          $ref: '#/components/schemas/Gender'
+        address:
+          type: string
+          description: "the address of the patient"
+          x-field-extra-annotation: |
+            @Size(max=50, message = "Address must not exceed 50 characters")
+            @Pattern(regexp = "^$|^\\d+\\s+[A-Za-z0-9\\s]+$", message = "Address must start with a number followed by the street name")
+          example: "1 High Street"
+        phoneNumber:
+          type: string
           description: "the phone number of the patient"
           x-field-extra-annotation: |
-            @Pattern(regexp = "^(\\d{10}|\\d{3}-\\d{3}-\\d{4})$", message = "Phone number must be exactly 10 digits or in the format xxx-xxx-xxxx")
-          example: "0123456789"
+            @Pattern(regexp = "^$|^\\d{3}-\\d{3}-\\d{4}$",message = "Phone number must be in format xxx-xxx-xxxx")
+          example: "012-345-6789"
+    Gender:
+      type: string
+      enum: [ "M", "F" ]
+      description: "Gender of the patient"

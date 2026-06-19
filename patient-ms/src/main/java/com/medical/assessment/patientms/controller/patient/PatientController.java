@@ -3,6 +3,7 @@ package com.medical.assessment.patientms.controller.patient;
 import com.medical.assessment.patientms.patient.api.PatientApi;
 import com.medical.assessment.patientms.patient.model.PatientCreateDto;
 import com.medical.assessment.patientms.patient.model.PatientDto;
+import com.medical.assessment.patientms.patient.model.PatientUpdateDto;
 import com.medical.assessment.patientms.service.PatientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,11 +25,19 @@ public class PatientController implements PatientApi {
     private final PatientService patientService;
 
     @Override
-    public ResponseEntity<PatientDto> getPatientById(@PathVariable("id") @Positive final Long id) {
+    public ResponseEntity<PatientDto> getPatientById(@PathVariable("id") final Long id) {
         log.info("get patient id");
         final PatientDto patientDto = patientService.getPatientById(id);
         return ResponseEntity.ok(patientDto);
     }
+
+    @Override
+    public ResponseEntity<PatientDto> updatePatient(Long id, PatientUpdateDto patientUpdateDto) {
+        log.info("update patient");
+        final PatientDto patientDto = patientService.updatePatient(id, patientUpdateDto);
+        return ResponseEntity.ok(patientDto);
+    }
+
 
     @Override
     public ResponseEntity<PatientDto> createPatient(@Valid @RequestBody final PatientCreateDto patientCreateDto) {

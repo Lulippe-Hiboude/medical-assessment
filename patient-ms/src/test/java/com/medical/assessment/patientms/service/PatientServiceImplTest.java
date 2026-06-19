@@ -4,6 +4,7 @@ import com.medical.assessment.patientms.exception.PatientAlreadyExistsException;
 import com.medical.assessment.patientms.exception.PatientNotFoundException;
 import com.medical.assessment.patientms.patient.model.PatientCreateDto;
 import com.medical.assessment.patientms.patient.model.PatientDto;
+import com.medical.assessment.patientms.patient.model.PatientUpdateDto;
 import com.medical.assessment.patientms.persistence.entity.Patient;
 import com.medical.assessment.patientms.persistence.enums.Gender;
 import com.medical.assessment.patientms.persistence.repository.PatientRepository;
@@ -278,13 +279,156 @@ class PatientServiceImplTest {
         }
     }
 
+    // =========================
+    // UPDATE PATIENT
+    // =========================
+
+    //TODO CREATE TEST CASE FOR UPDATE
+    @Nested
+    @DisplayName("updatePatient")
+    class updatePatient {
+        @Test
+        @DisplayName("should update patient")
+        void shouldUpdatePatient() {
+            //given
+            final long id = 1L;
+            final PatientUpdateDto updateDto= new PatientUpdateDto();
+            updateDto.setFirstName("Jane");
+            updateDto.setLastName("Smith");
+            updateDto.setGender(com.medical.assessment.patientms.patient.model.Gender.F);
+            updateDto.setBirthDate(LocalDate.of(1999, 1, 1));
+            updateDto.setAddress("1 High street");
+            updateDto.setPhoneNumber("123-456-7777");
+
+
+            final Patient existingPatient = getPatient(id);
+
+            given(patientRepository.findByPatientId(id)).willReturn(Optional.of(existingPatient));
+
+
+            //when
+            final PatientDto patientDto = patientServiceImpl.updatePatient(id, updateDto);
+
+            //then
+            verify(patientRepository, times(1)).save(patientCaptor.capture());
+            final Patient updatedPatient = patientCaptor.getValue();
+            assertThat(updatedPatient)
+                    .usingRecursiveComparison()
+                    .ignoringFields("patientId")
+                    .isEqualTo(updateDto);
+
+            assertThat(patientDto)
+                    .usingRecursiveComparison()
+                    .ignoringFields("gender", "id","patientId")
+                    .isEqualTo(updatedPatient);
+
+            assertThat(patientDto.getId()).isEqualTo(updatedPatient.getPatientId());
+            assertThat(patientDto.getGender().getValue()).isEqualTo(updatedPatient.getGender().getValue());
+        }
+
+        @Test
+        @DisplayName("should update patient with null value")
+        void shouldUpdatePatientWithNullValue() {
+            //given
+            final long id = 1L;
+
+            final PatientUpdateDto updateDto= new PatientUpdateDto();
+            updateDto.setFirstName(null);
+            updateDto.setLastName("Smith");
+            updateDto.setGender(null);
+            updateDto.setBirthDate(null);
+            updateDto.setAddress("1 High street");
+            updateDto.setPhoneNumber("123-456-7777");
+
+            final Patient existingPatient = getPatient(id);
+
+            given(patientRepository.findByPatientId(id)).willReturn(Optional.of(existingPatient));
+
+            //when
+            final PatientDto patientDto = patientServiceImpl.updatePatient(id, updateDto);
+
+            //then
+            verify(patientRepository, times(1)).save(patientCaptor.capture());
+            final Patient updatedPatient = patientCaptor.getValue();
+
+            assertThat(updatedPatient)
+                    .usingRecursiveComparison()
+                    .comparingOnlyFields("lastName","address", "phoneNumber")
+                    .isEqualTo(updateDto);
+
+            assertThat(updatedPatient)
+                    .usingRecursiveComparison()
+                    .comparingOnlyFields("firstName", "gender", "birthDate")
+                    .isEqualTo(existingPatient);
+        }
+
+        @Test
+        @DisplayName("should throw Illegal Argument Exception if update request is null")
+        void shouldThrowIllegalArgumentExceptionIfUpdateRequestIsNull() {
+            //given
+            final long id = 1L;
+
+            //when
+            assertThrows(IllegalArgumentException.class, () -> patientServiceImpl.updatePatient(id, null));
+
+            //then
+            verify(patientRepository, times(0)).save(any());
+
+        }
+
+        @Test
+        @DisplayName("should throw Illegal Argument Exception if all fields are null ")
+        void shouldThrowIllegalArgumentExceptionIfAllFieldsAreNull() {
+            //given
+            final long id = 1L;
+
+            final PatientUpdateDto updateDto= new PatientUpdateDto();
+            updateDto.setFirstName(null);
+            updateDto.setLastName(null);
+            updateDto.setGender(null);
+            updateDto.setBirthDate(null);
+            updateDto.setAddress(null);
+            updateDto.setPhoneNumber(null);
+
+            //when
+            assertThrows(IllegalArgumentException.class, () -> patientServiceImpl.updatePatient(id, updateDto));
+
+            //then
+            verify(patientRepository, times(0)).save(any());
+        }
+
+        @Test
+        @DisplayName("should throw Patient Not Found Exception")
+        void shouldThrowPatientNotFoundException() {
+            //given
+            final long id = 1L;
+
+            final PatientUpdateDto updateDto= new PatientUpdateDto();
+            updateDto.setFirstName(null);
+            updateDto.setLastName("Smith");
+            updateDto.setGender(null);
+            updateDto.setBirthDate(null);
+            updateDto.setAddress("1 High street");
+            updateDto.setPhoneNumber("123-456-7777");
+
+            given(patientRepository.findByPatientId(id)).willReturn(Optional.empty());
+
+            //when
+            assertThrows(PatientNotFoundException.class, () -> patientServiceImpl.updatePatient(id, updateDto));
+
+            //then
+            verify(patientRepository, times(0)).save(any());
+
+        }
+    }
+
     private PatientCreateDto getPatientCreateDto() {
         final String firstName = "John";
         final String lastName = "Doe";
         final LocalDate birthDate = LocalDate.of(1995, 1, 1);
         final String address = "123 Main St";
-        final String phoneNumber = "1234567890";
-        final PatientCreateDto.GenderEnum gender = PatientCreateDto.GenderEnum.M;
+        final String phoneNumber = "123-456-7890";
+        final com.medical.assessment.patientms.patient.model.Gender gender = com.medical.assessment.patientms.patient.model.Gender.M;
 
         final PatientCreateDto patientCreateDto = new PatientCreateDto();
         patientCreateDto.setFirstName(firstName);
@@ -314,7 +458,7 @@ class PatientServiceImplTest {
         final String firstName = "John";
         final String lastName = "Doe";
         final String address = "123 Main St";
-        final String phoneNumber = "1234567890";
+        final String phoneNumber = "123-456-7890";
         final Gender gender = Gender.M;
         return Patient.builder()
                 .patientId(id)

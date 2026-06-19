@@ -1,8 +1,10 @@
 package com.medical.assessment.patientms.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.medical.assessment.patientms.patient.model.Gender;
 import com.medical.assessment.patientms.patient.model.PatientCreateDto;
 import com.medical.assessment.patientms.patient.model.PatientDto;
+import com.medical.assessment.patientms.patient.model.PatientUpdateDto;
 import com.medical.assessment.patientms.persistence.entity.Patient;
 import com.medical.assessment.patientms.persistence.repository.PatientRepository;
 import com.medical.assessment.patientms.security.jwt.JwtService;
@@ -23,8 +25,7 @@ import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -98,9 +99,9 @@ public class PatientControllerIT {
         final String firstName = "Jane";
         final String lastName = "Doe";
         final LocalDate birthDate = LocalDate.of(1995, 1, 1);
-        final PatientCreateDto.GenderEnum gender = PatientCreateDto.GenderEnum.F;
+        final Gender gender = Gender.F;
         final String address = "123 Main St";
-        final String phoneNumber = "0123456789";
+        final String phoneNumber = "012-345-6789";
 
         final PatientCreateDto patientCreateDto = getPatientCreateDto(firstName, lastName, birthDate, gender, address, phoneNumber);
 
@@ -141,10 +142,54 @@ public class PatientControllerIT {
         assertThat(patient.getPhoneNumber()).isEqualTo(patientCreateDto.getPhoneNumber());
     }
 
+    //TODO CREATE TEST CASES
+    @Test
+    @DisplayName("should update patient")
+    void shouldUpdatePatient() throws Exception {
+        //given
+        final String token = jwtService.generateToken("organizer", "ORGANIZER");
+
+        final Long id = 1L;
+        final String lastName = "Smith";
+        final String address = "5 High street";
+        final String phoneNumber = "123-456-7777";
+
+        final PatientUpdateDto updateDto = new PatientUpdateDto();
+        updateDto.setFirstName(null);
+        updateDto.setLastName(lastName);
+        updateDto.setGender(null);
+        updateDto.setBirthDate(null);
+        updateDto.setAddress(address);
+        updateDto.setPhoneNumber(phoneNumber);
+
+        //when
+        final MvcResult result = mockMvc.perform(patch("/patient/{id}", id)
+                        .with(csrf())
+                        .header("Authorization", "Bearer " + token)
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(updateDto))
+                ).andExpect(status().isOk())
+                .andReturn();
+
+        //then
+        final String responseBody = result.getResponse().getContentAsString();
+        final PatientDto patientDto = objectMapper.readValue(responseBody, PatientDto.class);
+        assertThat(patientDto)
+                .usingRecursiveComparison()
+                .comparingOnlyFields("lastName", "address", "phoneNumber")
+                .isEqualTo(updateDto);
+
+        final Patient patient = patientRepository.findByPatientId(id).get();
+        assertThat(patient)
+                .usingRecursiveComparison()
+                .ignoringFields("patientId", "id")
+                .isEqualTo(patientDto);
+    }
+
     private static PatientCreateDto getPatientCreateDto(final String firstName,
                                                         final String lastName,
                                                         final LocalDate birthDate,
-                                                        final PatientCreateDto.GenderEnum gender,
+                                                        final Gender gender,
                                                         final String address,
                                                         final String phoneNumber) {
 
