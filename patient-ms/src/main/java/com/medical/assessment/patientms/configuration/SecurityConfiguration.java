@@ -13,7 +13,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.context.SecurityContextHolderFilter;
 
 @Slf4j
 @Configuration
@@ -39,7 +38,8 @@ public class SecurityConfiguration {
                                 "/v3/api-docs/**",
                                 "/v3/api-docs",
                                 "/favicon.ico",
-                                "/webjars/**")
+                                "/webjars/**",
+                                "/error/**")
                         .permitAll()
 
                         .requestMatchers(
@@ -52,7 +52,11 @@ public class SecurityConfiguration {
 
                         .requestMatchers(
                                 HttpMethod.POST, "/patient/**")
-                        .permitAll()
+                        .hasRole("ORGANIZER")
+
+                        .requestMatchers(
+                                HttpMethod.PATCH, "/patient/**")
+                        .hasRole("ORGANIZER")
 
                         .anyRequest()
                         .authenticated()

@@ -2,6 +2,7 @@ package com.medical.assessment.patientms.service;
 
 import com.medical.assessment.patientms.patient.model.PatientCreateDto;
 import com.medical.assessment.patientms.patient.model.PatientDto;
+import com.medical.assessment.patientms.patient.model.PatientUpdateDto;
 
 import java.util.List;
 
@@ -11,4 +12,6 @@ public interface PatientService {
     List<PatientDto> getAllPatients();
 
     PatientDto createPatient(PatientCreateDto patientCreateDto);
+
+    PatientDto updatePatient(Long patientId ,PatientUpdateDto patientUpdateDto);
 }
