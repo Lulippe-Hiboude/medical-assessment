@@ -9,6 +9,10 @@ spring:
         webflux:
           routes:
             - id: patient-ms
-              uri : http://patient-ms:8081
+              uri : http://localhost:8081
               predicates:
                 - Path=/patient/**
+            - id: auth-ms
+              uri : http://localhost:8082
+              predicates:
+                - Path=/auth/**
