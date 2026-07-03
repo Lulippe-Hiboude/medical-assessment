@@ -10,9 +10,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import java.time.Clock;
-import java.time.Instant;
 import java.util.Date;
+import java.util.List;
+
 
 import static io.jsonwebtoken.security.Keys.hmacShaKeyFor;
 
@@ -27,8 +27,8 @@ public class JwtService {
     private long expirationDate;
 
     public Role extractRole(final String token) {
-        final String role = extractClaims(token).get("role", String.class);
-        return Role.fromValue(role);
+        final List<String> roles = extractClaims(token).get("roles", List.class);
+        return Role.fromValue(roles.get(0));
     }
 
     public String extractUsername(final String token) {
@@ -46,7 +46,7 @@ public class JwtService {
         final Date expiration = new Date(now.getTime() + expirationDate);
         return Jwts.builder()
                 .subject(username)
-                .claim("role", validRole.name())
+                .claim("roles", List.of(validRole.name()))
                 .issuedAt(now)
                 .expiration(expiration)
                 .signWith(getSignKey(secretKey))

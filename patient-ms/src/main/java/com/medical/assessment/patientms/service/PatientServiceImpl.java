@@ -68,16 +68,25 @@ public class PatientServiceImpl implements PatientService {
 
         final Patient existingPatient = findPatientByPatientId(patientId);
         final Patient updatePatient = PatientMapper.INSTANCE.updatePatient(patientUpdateDto,existingPatient);
+        log.debug("Updating patient:  {}", updatePatient);
         patientRepository.save(updatePatient);
 
         return PatientMapper.INSTANCE.toPatientDto(updatePatient);
     }
 
     private void normalizeUpdateRequest(final PatientUpdateDto patientUpdateDto) {
-        patientUpdateDto.setFirstName(normalizeStringValue(patientUpdateDto.getFirstName()));
-        patientUpdateDto.setLastName(normalizeStringValue(patientUpdateDto.getLastName()));
+        patientUpdateDto.setFirstName(normalizedMandatoryField(patientUpdateDto.getFirstName()));
+        patientUpdateDto.setLastName(normalizedMandatoryField(patientUpdateDto.getLastName()));
         patientUpdateDto.setPhoneNumber(normalizeStringValue(patientUpdateDto.getPhoneNumber()));
         patientUpdateDto.setAddress(normalizeStringValue(patientUpdateDto.getAddress()));
+        log.debug("Normalized update request: {}", patientUpdateDto);
+    }
+
+    private String normalizedMandatoryField(final String value) {
+        if (StringUtils.isBlank(value)) {
+            return null;
+        }
+        return StringUtils.normalizeSpace(value);
     }
 
     private String normalizeStringValue(final String value){
