@@ -22,7 +22,9 @@
     </properties>
 
     <modules>
+        <module>gateway</module>
         <module>patient-ms</module>
+        <module>auth-ms</module>
     </modules>
 
     <dependencyManagement>

@@ -1,0 +1,14 @@
+
+server:
+  port: 8080
+
+spring:
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: patient-ms
+              uri : http://patient-ms:8081
+              predicates:
+                - Path=/patient/**

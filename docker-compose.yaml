@@ -1,0 +1,14 @@
+services:
+  gateway:
+    ports:
+      - "8080:8080"
+    networks:
+      - public
+      - internal
+  patient-ms:
+    networks:
+      - internal
+networks:
+  public:
+  internal:
+    internal: true
