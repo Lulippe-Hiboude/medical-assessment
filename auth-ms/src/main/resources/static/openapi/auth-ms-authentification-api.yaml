@@ -1,0 +1,70 @@
+openapi: 3.0.3
+info:
+  title: Auth MS Authentification API
+  description: Auth MS Authentification API
+  version: 1.0.0
+
+servers:
+  - url: "/"
+    description: "Current"
+  - url: "http://localhost:8080"
+    description: "localhost"
+
+tags:
+  - name: authentification
+    description: Everything for auth MS about authentification
+
+paths:
+  /auth/login:
+    post:
+      tags:
+        - authentification
+      summary: authenticate a user and return jwt token
+      operationId: login
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRequest'
+      responses:
+        '200':
+          description: JWT token generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Invalid input
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: not found - invalid username or password
+          content:
+            text/plain:
+              schema:
+                type: string
+components:
+  schemas:
+    AuthRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          example: doctor
+        password:
+          type: string
+          example: password
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: The generated JWT token
+          example: "eyJhbGciOiJIUz"

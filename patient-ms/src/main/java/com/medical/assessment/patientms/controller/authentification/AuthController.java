@@ -3,7 +3,6 @@ package com.medical.assessment.patientms.controller.authentification;
 import com.medical.assessment.patientms.authentification.api.AuthentificationApi;
 import com.medical.assessment.patientms.authentification.model.AuthTokenResponse;
 import com.medical.assessment.patientms.security.jwt.JwtService;
-import com.medical.assessment.patientms.security.jwt.enums.Role;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

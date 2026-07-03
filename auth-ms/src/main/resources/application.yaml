@@ -1,0 +1,20 @@
+server:
+  port: 8082
+  servlet:
+    context-path: /
+application:
+  title: Auth Management System
+  version: 1.0.0
+spring:
+  application:
+    name: auth-ms
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 3600000
