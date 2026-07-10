@@ -1,8 +1,8 @@
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    username: postgres
+    password: postgres
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -17,5 +17,5 @@ spring:
     default-schema: patients_test
     contexts: test
 jwt:
-  secret: ${JWT_SECRET}
-  expiration: 3600000
+  secret: aeFpr8Z9oduHGSIu+oiHz6BycZtN3kB1H+Srz6OEAhs=
+  expiration: 36000000000000

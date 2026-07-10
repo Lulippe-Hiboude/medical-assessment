@@ -22,9 +22,10 @@
     </properties>
 
     <modules>
-        <module>gateway</module>
-        <module>patient-ms</module>
         <module>auth-ms</module>
+        <module>gateway</module>
+        <module>note-ms</module>
+        <module>patient-ms</module>
     </modules>
 
     <dependencyManagement>
@@ -64,6 +65,7 @@
                         <includes>
                             <include>**/*Test.java</include>
                             <include>**/*IT.java</include>
+                            <include>**/*Tests</include>
                         </includes>
                     </configuration>
                 </plugin>
@@ -73,7 +75,11 @@
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>${jacoco.version}</version>
-
+                    <configuration>
+                        <excludes>
+                            <exclude>**/*Application.class</exclude>
+                        </excludes>
+                    </configuration>
                     <executions>
                         <execution>
                             <id>prepare-agent</id>

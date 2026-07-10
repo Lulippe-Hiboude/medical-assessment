@@ -1,0 +1,3 @@
+jwt:
+  secret: aeFpr8Z9oduHGSIu+oiHz6BycZtN3kB1H+Srz6OEAhs=
+  expiration: 36000000000000
