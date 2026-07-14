@@ -176,8 +176,60 @@
                 <artifactId>jacoco-maven-plugin</artifactId>
 
                 <configuration>
+                    <excludes>
+                        <exclude>**/note/api/**</exclude>
+                        <exclude>**/note/model/**</exclude>
+                    </excludes>
                 </configuration>
 
+            </plugin>
+
+            <!-- OPEN API -->
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>${openapi-generator-plugin.version}</version>
+
+                <executions>
+                    <execution>
+                        <id>note</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+
+                        <configuration>
+                            <inputSpec>
+                                ${project.basedir}/src/main/resources/static/openapi/note-ms-note-api.yaml
+                            </inputSpec>
+
+                            <apiPackage>com.medical.assessment.notems.note.api</apiPackage>
+                            <modelPackage>com.medical.assessment.notems.note.model</modelPackage>
+
+                            <generatorName>spring</generatorName>
+
+                            <generateModelTests>false</generateModelTests>
+                            <generateModelDocumentation>false</generateModelDocumentation>
+                            <generateApiTests>false</generateApiTests>
+                            <generateSupportingFiles>false</generateSupportingFiles>
+
+                            <configOptions>
+                                <useTags>true</useTags>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <skipDefaultInterface>true</skipDefaultInterface>
+                                <interfaceOnly>true</interfaceOnly>
+                                <returnResponse>true</returnResponse>
+                                <dateLibrary>java8-localdatetime</dateLibrary>
+                            </configOptions>
+
+                            <additionalProperties>
+                                <additionalProperty>
+                                    removeEnumValuePrefix=false
+                                </additionalProperty>
+                            </additionalProperties>
+
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

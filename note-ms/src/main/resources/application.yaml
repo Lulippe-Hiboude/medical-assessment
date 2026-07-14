@@ -5,6 +5,7 @@ server:
 application:
     title: Note Management System
     version: 1.0.0
+
 spring:
     application:
         name: note-ms
@@ -17,3 +18,13 @@ spring:
         mongodb:
             uri: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@localhost:27017/notedb?authSource=admin
             database: notedb
+
+springdoc:
+    api-docs:
+        enabled: true
+    swagger-ui:
+        enabled: true
+
+jwt:
+    secret: ${JWT_SECRET}
+    expiration: 3600000
