@@ -7,7 +7,7 @@ info:
 servers:
   - url: "/"
     description: "Current"
-  - url: "http://localhost:8080"
+  - url: "http://localhost:8082"
     description: "localhost"
 
 tags:

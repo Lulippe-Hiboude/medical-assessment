@@ -2,7 +2,18 @@
 server:
   port: 8080
 
+application:
+  title: Gateway
+  version: 1.0.0
+
 spring:
+  application:
+    name: note-ms
+  main:
+    banner-mode: console
+  banner:
+    charset: UTF-8
+    location: banner.txt
   cloud:
     gateway:
       server:

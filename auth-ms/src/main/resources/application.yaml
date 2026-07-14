@@ -8,7 +8,11 @@ application:
 spring:
   application:
     name: auth-ms
-
+  main:
+    banner-mode: console
+  banner:
+    charset: UTF-8
+    location: banner.txt
 springdoc:
   api-docs:
     enabled: true
