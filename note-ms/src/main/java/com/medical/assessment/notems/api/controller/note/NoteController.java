@@ -1,4 +1,4 @@
-package com.medical.assessment.notems.api.controller;
+package com.medical.assessment.notems.api.controller.note;
 
 import com.medical.assessment.notems.domain.note.service.NoteService;
 import com.medical.assessment.notems.note.api.NotesApi;

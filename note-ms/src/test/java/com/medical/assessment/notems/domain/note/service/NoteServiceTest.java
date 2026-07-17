@@ -1,5 +1,6 @@
 package com.medical.assessment.notems.domain.note.service;
 
+import com.medical.assessment.notems.infrastructure.client.patient.service.PatientFeignService;
 import com.medical.assessment.notems.note.model.NoteCreateDto;
 import com.medical.assessment.notems.note.model.NoteDto;
 import com.medical.assessment.notems.persistence.entity.Note;
@@ -7,18 +8,19 @@ import com.medical.assessment.notems.persistence.repository.NoteRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -27,6 +29,9 @@ class NoteServiceTest {
 
     @Mock
     private NoteRepository noteRepository;
+
+    @Mock
+    private PatientFeignService patientFeignService;
 
     @InjectMocks
     private NoteService noteService;
@@ -45,6 +50,7 @@ class NoteServiceTest {
                 .content("Test note content")
                 .createdAt(LocalDateTime.now())
                 .build();
+        willDoNothing().given(patientFeignService).verifyPatientExists(noteCreateDto.getPatientId());
         given(noteRepository.save(any(Note.class))).willReturn(expected);
 
         //when
@@ -56,6 +62,38 @@ class NoteServiceTest {
         assertThat(result.getId()).isEqualTo(expected.getId());
         assertThat(result.getContent()).isEqualTo(expected.getContent());
         assertThat(result.getCreatedAt()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("should throw exception when patient does not exist and do nothing")
+    void shouldThrowExceptionWhenPatientDoesNotExist() {
+        //given
+        final NoteCreateDto noteCreateDto = new NoteCreateDto()
+                .patientId(1L)
+                .content("Test note content");
+        willThrow(new ResponseStatusException(HttpStatus.NOT_FOUND,
+                "Patient not found with id " + noteCreateDto.getPatientId()))
+                .given(patientFeignService).verifyPatientExists(noteCreateDto.getPatientId());
+
+        //when & then
+        assertThrows(ResponseStatusException.class, () -> noteService.createNote(noteCreateDto));
+        verify(noteRepository, never()).save(any(Note.class));
+    }
+
+    @Test
+    @DisplayName("should throw exception when feign call failed and do nothing")
+    void shouldThrowExceptionWhenFeignCallFailed() {
+        //given
+        final NoteCreateDto noteCreateDto = new NoteCreateDto()
+                .patientId(1L)
+                .content("Test note content");
+        willThrow(new ResponseStatusException(HttpStatus.BAD_GATEWAY,
+                "unable to verify patient with id " + noteCreateDto.getPatientId()))
+                .given(patientFeignService).verifyPatientExists(noteCreateDto.getPatientId());
+
+        //when & then
+        assertThrows(ResponseStatusException.class, () -> noteService.createNote(noteCreateDto));
+        verify(noteRepository, never()).save(any(Note.class));
     }
 
     @Test
@@ -106,4 +144,6 @@ class NoteServiceTest {
         assertThat(result).isNotNull();
         assertThat(result).isEmpty();
     }
+
+
 }

@@ -6,6 +6,10 @@ application:
     title: Note Management System
     version: 1.0.0
 
+
+patientms:
+    url: "http://localhost:8081"
+
 spring:
     application:
         name: note-ms
