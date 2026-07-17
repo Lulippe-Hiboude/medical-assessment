@@ -89,7 +89,6 @@ components:
           x-field-extra-annotation: |
             @NotNull(message = "patient Id is required")
             @Positive(message = "patient Id must be a positive number")
-          minimum: 1
           example: 1
         content:
           type: string
@@ -99,7 +98,6 @@ components:
             @Size(max = 2000, message = "content must not exceed 2000 characters")
           example: "This is a note about the patient's condition."
       required:
-        - patientId
         - content
 
     NoteDto:
