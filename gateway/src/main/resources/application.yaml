@@ -8,7 +8,7 @@ application:
 
 spring:
   application:
-    name: note-ms
+    name: gateway
   main:
     banner-mode: console
   banner:
@@ -27,3 +27,7 @@ spring:
               uri : http://localhost:8082
               predicates:
                 - Path=/auth/**
+            - id: note-ms
+              uri : http://localhost:8083
+              predicates:
+                - Path=/notes/**
