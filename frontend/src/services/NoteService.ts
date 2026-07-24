@@ -1,10 +1,7 @@
 import axios from 'axios';
 import type {Note, NoteCreateDto} from '../types/Note';
 
-
-
 const API_URL = '/api/notes';
-
 
 const getAuthHeader = () => ({
     headers: {Authorization: `Bearer ${localStorage.getItem('token')}`}
