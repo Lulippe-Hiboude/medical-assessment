@@ -1,10 +1,7 @@
 package com.medical.assessment.patientms.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.medical.assessment.patientms.patient.model.Gender;
-import com.medical.assessment.patientms.patient.model.PatientCreateDto;
-import com.medical.assessment.patientms.patient.model.PatientDto;
-import com.medical.assessment.patientms.patient.model.PatientUpdateDto;
+import com.medical.assessment.patientms.patient.model.*;
 import com.medical.assessment.patientms.persistence.entity.Patient;
 import com.medical.assessment.patientms.persistence.repository.PatientRepository;
 import com.medical.assessment.patientms.security.jwt.JwtService;
@@ -142,7 +139,6 @@ public class PatientControllerIT {
         assertThat(patient.getPhoneNumber()).isEqualTo(patientCreateDto.getPhoneNumber());
     }
 
-    //TODO CREATE TEST CASES
     @Test
     @DisplayName("should update patient")
     void shouldUpdatePatient() throws Exception {
@@ -184,6 +180,28 @@ public class PatientControllerIT {
                 .usingRecursiveComparison()
                 .ignoringFields("patientId", "id")
                 .isEqualTo(patientDto);
+    }
+
+    @Test
+    @DisplayName("should get patient risk profile")
+    void shouldGetPatientRiskProfile() throws Exception {
+        //given
+        final String token = jwtService.generateToken("doctor", "DOCTOR");
+        final Long id = 1L;
+        final PatientRiskProfile patientRiskProfile= patientServiceImpl.getPatientRiskProfileById(id);
+
+        //when
+        final MvcResult result = mockMvc.perform(get("/patient/{id}/risk-profile", id)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        //then
+        final String responseBody = result.getResponse().getContentAsString();
+        final String expectedResponseBody = objectMapper.writeValueAsString(patientRiskProfile);
+        assertThat(responseBody).isNotNull();
+        assertThat(responseBody).isEqualTo(expectedResponseBody);
+
     }
 
     private static PatientCreateDto getPatientCreateDto(final String firstName,

@@ -3,6 +3,7 @@ package com.medical.assessment.patientms.controller.patient;
 import com.medical.assessment.patientms.patient.api.PatientApi;
 import com.medical.assessment.patientms.patient.model.PatientCreateDto;
 import com.medical.assessment.patientms.patient.model.PatientDto;
+import com.medical.assessment.patientms.patient.model.PatientRiskProfile;
 import com.medical.assessment.patientms.patient.model.PatientUpdateDto;
 import com.medical.assessment.patientms.service.PatientService;
 import jakarta.validation.Valid;
@@ -26,9 +27,16 @@ public class PatientController implements PatientApi {
 
     @Override
     public ResponseEntity<PatientDto> getPatientById(@PathVariable("id") final Long id) {
-        log.info("get patient id");
+        log.info("get patient by id");
         final PatientDto patientDto = patientService.getPatientById(id);
         return ResponseEntity.ok(patientDto);
+    }
+
+    @Override
+    public ResponseEntity<PatientRiskProfile> getPatientRiskProfileById(final Long id) {
+        log.info("get patient risk profile");
+        final PatientRiskProfile patientRiskProfile = patientService.getPatientRiskProfileById(id);
+        return ResponseEntity.ok(patientRiskProfile);
     }
 
     @Override

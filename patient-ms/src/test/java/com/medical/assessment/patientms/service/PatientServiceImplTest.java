@@ -4,6 +4,7 @@ import com.medical.assessment.patientms.exception.PatientAlreadyExistsException;
 import com.medical.assessment.patientms.exception.PatientNotFoundException;
 import com.medical.assessment.patientms.patient.model.PatientCreateDto;
 import com.medical.assessment.patientms.patient.model.PatientDto;
+import com.medical.assessment.patientms.patient.model.PatientRiskProfile;
 import com.medical.assessment.patientms.patient.model.PatientUpdateDto;
 import com.medical.assessment.patientms.persistence.entity.Patient;
 import com.medical.assessment.patientms.persistence.enums.Gender;
@@ -19,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 import java.util.Optional;
 
@@ -283,7 +285,6 @@ class PatientServiceImplTest {
     // UPDATE PATIENT
     // =========================
 
-    //TODO CREATE TEST CASE FOR UPDATE
     @Nested
     @DisplayName("updatePatient")
     class updatePatient {
@@ -419,6 +420,70 @@ class PatientServiceImplTest {
             //then
             verify(patientRepository, times(0)).save(any());
 
+        }
+    }
+
+    @Nested
+    @DisplayName("get Patient Risk Profile")
+    class getPatientRiskProfile {
+        @Test
+        @DisplayName("should get Patient Risk Profile successfully")
+        void shouldGetPatientRiskProfile() {
+            long id = 1L;
+            final Patient patient = getPatient(id);
+            given(patientRepository.findByPatientId(id)).willReturn(Optional.of(patient));
+
+            //when
+            final PatientRiskProfile patientRiskProfile = patientServiceImpl.getPatientRiskProfileById(id);
+
+            //then
+            verify(patientRepository, times(1)).findByPatientId(id);
+            assertThat(patientRiskProfile).isNotNull();
+
+            final Integer expectedAge = Period.between(patient.getBirthDate(), LocalDate.now()).getYears();
+            assertThat(patientRiskProfile.getAge()).isEqualTo(expectedAge);
+            assertThat(patientRiskProfile.getGender().getValue()).isEqualTo(patient.getGender().getValue());
+        }
+
+        @Test
+        @DisplayName("should throw Illegal Argument Exception if id is null")
+        void shouldThrowIllegalArgumentExceptionIfIdIsNull() {
+            //given
+            final Long id = null;
+
+            //when & then
+            final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> patientServiceImpl.getPatientRiskProfileById(id));
+            assertEquals("Patient id must not be null", exception.getMessage());
+            verify(patientRepository, times(0)).findByPatientId(id);
+        }
+
+        @Test
+        @DisplayName("should throw PatientNotFound Exception if not patient found for id")
+        void shouldThrowPatientNotFoundExceptionIfNotPatientFoundForId() {
+            //given
+            final Long id = 1L;
+            given(patientRepository.findByPatientId(id)).willReturn(Optional.empty());
+
+            //when & then
+            final PatientNotFoundException exception = assertThrows(PatientNotFoundException.class, () -> patientServiceImpl.getPatientRiskProfileById(id));
+            assertEquals("Patient with id " + id + " not found", exception.getMessage());
+            verify(patientRepository, times(1)).findByPatientId(id);
+        }
+
+        @Test
+        @DisplayName("should calculate age successfully")
+        void shouldCalculateAgeSuccessfully() {
+            //given
+            final Patient patient = getPatient(1L);
+            given(patientRepository.findByPatientId(1L)).willReturn(Optional.of(patient));
+
+            //when
+            final PatientRiskProfile patientRiskProfile = patientServiceImpl.getPatientRiskProfileById(1L);
+
+            //then
+            assertThat(patientRiskProfile).isNotNull();
+            final Integer expected = Period.between(patient.getBirthDate(), LocalDate.now()).getYears();
+            assertThat(patientRiskProfile.getAge()).isEqualTo(expected);
         }
     }
 
