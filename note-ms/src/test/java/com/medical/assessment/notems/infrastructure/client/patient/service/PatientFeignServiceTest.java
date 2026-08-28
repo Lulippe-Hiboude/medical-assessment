@@ -16,6 +16,8 @@ class PatientFeignServiceTest {
     @InjectMocks
     PatientFeignService service;
 
+    //TODO NEED TO CHANGE ENDPOINT RESULT TO BOOLEAN
+
     @Test
     @DisplayName("should do nothing when patient exists")
     void ShouldDoNothingWhenPatientExists(){

@@ -1,18 +1,15 @@
 package com.medical.assessment.notems.domain.note.service;
 
 import com.medical.assessment.notems.domain.note.mapper.NoteMapper;
-import com.medical.assessment.notems.infrastructure.client.patient.PatientFeignClient;
 import com.medical.assessment.notems.infrastructure.client.patient.service.PatientFeignService;
 import com.medical.assessment.notems.note.model.NoteCreateDto;
 import com.medical.assessment.notems.note.model.NoteDto;
 import com.medical.assessment.notems.persistence.entity.Note;
 import com.medical.assessment.notems.persistence.repository.NoteRepository;
-import feign.FeignException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -33,5 +30,15 @@ public class NoteService {
     public List<NoteDto> getNotesByPatientId(final Long patientId) {
         final List<Note> notes = noteRepository.findByPatientIdOrderByCreatedAtDesc(String.valueOf(patientId));
         return NoteMapper.INSTANCE.toNoteDtoList(notes);
+    }
+
+    public List<String> getNotesContentByPatientId(final Long patientId) {
+        final List<Note> notes = noteRepository.findByPatientIdOrderByCreatedAtDesc(String.valueOf(patientId));
+        if (notes.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return notes.stream()
+                .map(Note::getContent)
+                .toList();
     }
 }

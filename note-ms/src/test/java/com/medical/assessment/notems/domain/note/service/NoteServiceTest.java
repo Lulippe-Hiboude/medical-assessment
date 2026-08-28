@@ -145,5 +145,49 @@ class NoteServiceTest {
         assertThat(result).isEmpty();
     }
 
+    @Test
+    @DisplayName("should return empty list content when no notes found for patient ID")
+    void shouldReturnEmptyListContentWhenNoNotesFoundForPatientId() {
+        //given
+        given(noteRepository.findByPatientIdOrderByCreatedAtDesc("1")).willReturn(List.of());
 
+        //when
+        List<String> result = noteService.getNotesContentByPatientId(1L);
+
+        //then
+        verify(noteRepository, times(1)).findByPatientIdOrderByCreatedAtDesc("1");
+        assertThat(result).isNotNull();
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    @DisplayName("should return list of notes content successfully for a patient ID")
+    void shouldListOfNotesSuccessfullyForPatientId() {
+        //given
+        final Note note1 = Note.builder()
+                .id("note1")
+                .patientId("1")
+                .content("Note 1 content")
+                .createdAt(LocalDateTime.now())
+                .build();
+        final Note note2 = Note.builder()
+                .id("note2")
+                .patientId("1")
+                .content("Note 2 content")
+                .createdAt(LocalDateTime.now().minusDays(1))
+                .build();
+        final List<Note> notes = List.of(note1, note2);
+
+        given(noteRepository.findByPatientIdOrderByCreatedAtDesc("1")).willReturn(notes);
+
+        //when
+        List<String> result = noteService.getNotesContentByPatientId(1L);
+
+        //then
+        verify(noteRepository, times(1)).findByPatientIdOrderByCreatedAtDesc("1");
+        assertThat(result).isNotNull();
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(result.getFirst()).isEqualTo(note1.getContent());
+        assertThat(result.getLast()).isEqualTo(note2.getContent());
+    }
 }

@@ -12,6 +12,8 @@ import org.springframework.web.server.ResponseStatusException;
 public class PatientFeignService {
     private final PatientFeignClient patientFeignClient;
 
+    //TODO NEED TO CHANGE ENDPOINT RESULT TO BOOLEAN
+
     public void verifyPatientExists(final Long patientId) {
         try {
             patientFeignClient.getPatientById(patientId);

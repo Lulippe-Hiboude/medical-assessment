@@ -31,4 +31,9 @@ public class NoteController implements NotesApi {
     public ResponseEntity<List<NoteDto>> getNotesByPatientId(Long patientId) {
         return ResponseEntity.ok(noteService.getNotesByPatientId(patientId));
     }
+
+    @Override
+    public ResponseEntity<List<String>> getNotesContentByPatientId(final Long patientId) {
+        return ResponseEntity.ok(noteService.getNotesContentByPatientId(patientId));
+    }
 }

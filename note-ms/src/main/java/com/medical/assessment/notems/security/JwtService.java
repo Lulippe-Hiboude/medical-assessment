@@ -22,6 +22,9 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String secretKey;
 
+    @Value("${jwt.expiration}")
+    private long expirationDate;
+
     public Role extractRole(final String token) {
         final List<String> roles = extractClaims(token).get("roles", List.class);
         log.debug("Extracted roles from token: {}", roles);

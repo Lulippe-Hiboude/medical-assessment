@@ -11,11 +11,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -113,10 +115,19 @@ class NoteControllerTest {
     @WithMockUser(username = "doctor", roles = "DOCTOR")
     void shouldReturnNotFoundWhenPatientDoesNotExists() throws Exception {
         //given
+        final long patientId = 1L;
+        given(noteService.getNotesByPatientId(patientId)).willThrow(new ResponseStatusException(HttpStatus.NOT_FOUND,
+                "Patient not found with id " + patientId));
 
         //when
+        final MvcResult result = mockMvc.perform(get("/notes/patient/1"))
+
+                .andExpect(status().isNotFound())
+                .andReturn();
 
         //then
+        final ErrorResponse errorResponse = objectMapper.readValue(result.getResponse().getContentAsString(), ErrorResponse.class);
+        assertThat(errorResponse.message()).isEqualTo("Patient not found with id " + patientId);
     }
 
     @Test
@@ -124,11 +135,21 @@ class NoteControllerTest {
     @WithMockUser(username = "doctor", roles = "DOCTOR")
     void shouldReturnBadGatewayWhenPatientServiceUnavailable() throws Exception {
         //given
+        final long patientId = 1L;
+        given(noteService.getNotesByPatientId(patientId)).willThrow(new ResponseStatusException(HttpStatus.BAD_GATEWAY,
+                "unable to verify patient with id " + patientId));
 
         //when
+        final MvcResult result = mockMvc.perform(get("/notes/patient/1"))
+
+                .andExpect(status().isBadGateway())
+                .andReturn();
 
         //then
+        final ErrorResponse errorResponse = objectMapper.readValue(result.getResponse().getContentAsString(), ErrorResponse.class);
+        assertThat(errorResponse.message()).isEqualTo("unable to verify patient with id " + patientId);
     }
+
 
     @Test
     @DisplayName("should return BAD REQUEST for invalidNoteCreateDto with negative id and empty content")
@@ -179,6 +200,51 @@ class NoteControllerTest {
         assertThat(errorResponse.errors())
                 .containsEntry("patientId", "patient Id is required")
                 .containsEntry("content", "content must not exceed 2000 characters");
+    }
+
+    @Test
+    @DisplayName("should return list of all notes content for a given patient Id")
+    @WithMockUser(username = "doctor", roles = "DOCTOR")
+    void shouldReturnListOfAllNotesContentForGivenPatientId() throws Exception {
+        //given
+        final String contentNote1 = "content note 1";
+        final String contentNote2 = "content note 2";
+        final List<String> notesContent = List.of(
+                contentNote1,
+                contentNote2
+        );
+
+        given(noteService.getNotesContentByPatientId(1L)).willReturn(notesContent);
+
+        //when
+        final MvcResult result = mockMvc.perform(get("/notes/patient/1/note-content")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andReturn();
+
+        //then
+        final String responseContent = result.getResponse().getContentAsString();
+        final String expectedResponseContent = objectMapper.writeValueAsString(List.of(contentNote1, contentNote2));
+        assertThat(responseContent).isEqualTo(expectedResponseContent);
+    }
+
+    @Test
+    @DisplayName("should return empty list if no notes found")
+    @WithMockUser(username = "doctor", roles = "DOCTOR")
+    void shouldReturnEmptyListIfNoNotesFound() throws Exception {
+        //given
+        given(noteService.getNotesContentByPatientId(1L)).willReturn(List.of());
+
+        //when
+        final MvcResult result = mockMvc.perform(get("/notes/patient/1/note-content"))
+
+                .andExpect(status().isOk())
+                .andReturn();
+
+        //then
+        assertThat(result.getResponse().getContentAsString()).isEqualTo("[]");
     }
 
     private NoteCreateDto getNoteCreateDto() {
