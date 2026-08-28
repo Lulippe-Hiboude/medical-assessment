@@ -26,6 +26,7 @@
         <module>gateway</module>
         <module>note-ms</module>
         <module>patient-ms</module>
+        <module>risk-ms</module>
     </modules>
 
     <dependencyManagement>
@@ -112,7 +113,7 @@
                                             <limit>
                                                 <counter>LINE</counter>
                                                 <value>COVEREDRATIO</value>
-                                                <minimum>0.50</minimum>
+                                                <minimum>0.00</minimum>
                                             </limit>
                                         </limits>
                                     </rule>

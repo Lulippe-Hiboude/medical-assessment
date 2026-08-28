@@ -1,0 +1,67 @@
+openapi: 3.0.3
+info:
+  title: Risk MS Risk API
+  description: Risk MS Risk API
+  version: 1.0.0
+
+servers:
+  - url: "/"
+    description: "Current"
+  - url: "http://localhost:8084"
+    description: "localhost"
+
+tags:
+  - name: risk
+    description: Everything for risk MS about medical assessment
+
+paths:
+  /risk/{id}:
+    get:
+      tags:
+        - risk
+      summary: get risk profile  by id
+      operationId: getRiskProfileForPatient
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: the id of the patient being queried
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: risk calculate for patient
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskDto'
+        '400':
+          description: Invalid input
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: Not found - no patient found for the given id
+          content:
+            text/plain:
+              schema:
+                type: string
+
+components:
+  schemas:
+    RiskDto:
+      type: string
+      enum: [
+              "NONE",
+              "BORDERLINE",
+              "IN_DANGER",
+              "EARLY_ONSET",
+              "UNKNOW",
+              "NO_DATA"
+      ]
+      description: the level of risk of the patient
+      example: "NONE"
+  

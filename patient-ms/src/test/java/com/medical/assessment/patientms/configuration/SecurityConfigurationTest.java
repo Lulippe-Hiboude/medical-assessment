@@ -52,7 +52,6 @@ class SecurityConfigurationTest {
         // given
         final String token = jwtService.generateToken("test", "DOCTOR");
 
-
         // when & then
         mockMvc.perform(get("/patient/{id}", 1L)
                         .header("Authorization", "Bearer " + token))
