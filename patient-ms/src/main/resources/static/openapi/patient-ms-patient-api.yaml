@@ -135,6 +135,41 @@ paths:
             text/plain:
               schema:
                 type: string
+  /patient/{id}/risk-profile:
+    get:
+      tags:
+        - patient
+      summary: get age and gender of a patient by id
+      operationId: getPatientRiskProfileById
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: the id of the patient being queried
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: patient risk profile found for the given id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientRiskProfile'
+        '400':
+          description: Invalid input
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: Not found - no patient found for the given id
+          content:
+            text/plain:
+              schema:
+                type: string
+
 components:
   schemas:
     PatientDto:
@@ -251,6 +286,15 @@ components:
           x-field-extra-annotation: |
             @Pattern(regexp = "^$|^\\d{3}-\\d{3}-\\d{4}$",message = "Phone number must be in format xxx-xxx-xxxx")
           example: "012-345-6789"
+    PatientRiskProfile:
+      type: object
+      properties:
+        age:
+          type: int
+          description: "the age of the patient"
+          example: 30
+        gender:
+          $ref: '#/components/schemas/Gender'
     Gender:
       type: string
       enum: [ "M", "F" ]

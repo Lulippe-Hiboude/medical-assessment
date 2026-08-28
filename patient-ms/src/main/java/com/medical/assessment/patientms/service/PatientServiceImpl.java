@@ -5,6 +5,7 @@ import com.medical.assessment.patientms.exception.PatientNotFoundException;
 import com.medical.assessment.patientms.mapper.PatientMapper;
 import com.medical.assessment.patientms.patient.model.PatientCreateDto;
 import com.medical.assessment.patientms.patient.model.PatientDto;
+import com.medical.assessment.patientms.patient.model.PatientRiskProfile;
 import com.medical.assessment.patientms.patient.model.PatientUpdateDto;
 import com.medical.assessment.patientms.persistence.entity.Patient;
 import com.medical.assessment.patientms.persistence.repository.PatientRepository;
@@ -15,6 +16,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -72,6 +75,21 @@ public class PatientServiceImpl implements PatientService {
         patientRepository.save(updatePatient);
 
         return PatientMapper.INSTANCE.toPatientDto(updatePatient);
+    }
+
+    @Override
+    public PatientRiskProfile getPatientRiskProfileById(Long patientId) {
+        log.info("Getting patient risk profile");
+
+        final Patient patient = findPatientByPatientId(patientId);
+        final int age = calculatePatientAge(patient.getBirthDate());
+
+        return PatientMapper.INSTANCE.toPatientRiskProfile(patient.getGender(),age);
+    }
+
+    private int calculatePatientAge(final LocalDate birthDate) {
+        final LocalDate today = LocalDate.now();
+        return Period.between(birthDate, today).getYears();
     }
 
     private void normalizeUpdateRequest(final PatientUpdateDto patientUpdateDto) {

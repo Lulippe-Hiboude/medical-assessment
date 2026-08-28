@@ -3,10 +3,7 @@ package com.medical.assessment.patientms.controller.patient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.medical.assessment.patientms.exception.PatientAlreadyExistsException;
 import com.medical.assessment.patientms.exception.PatientNotFoundException;
-import com.medical.assessment.patientms.patient.model.Gender;
-import com.medical.assessment.patientms.patient.model.PatientCreateDto;
-import com.medical.assessment.patientms.patient.model.PatientDto;
-import com.medical.assessment.patientms.patient.model.PatientUpdateDto;
+import com.medical.assessment.patientms.patient.model.*;
 import com.medical.assessment.patientms.security.jwt.JwtService;
 import com.medical.assessment.patientms.service.PatientServiceImpl;
 import org.junit.jupiter.api.DisplayName;
@@ -161,6 +158,73 @@ class PatientControllerTest {
                     .andExpect(status().isBadRequest());
         }
     }
+    // =========================
+    // GET PATIENT RISK PROFILE
+    // =========================
+    @Nested
+    @DisplayName("getPatientRiskProfile")
+    class getPatientRiskProfile {
+
+        @Test
+        @DisplayName("should return Patient Risk Profile")
+        @WithMockUser(username = "user", roles = "ORGANIZER")
+        void shouldReturnPatientRiskProfile() throws Exception {
+            //given
+            final Long id = 1L;
+            given(patientServiceImpl.getPatientRiskProfileById(id)).willReturn(getPatientRiskProfile());
+
+            //when & then
+            final MvcResult result = mockMvc.perform(get("/patient/{id}/risk-profile", id))
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+            final String responseBody = result.getResponse().getContentAsString();
+            final String expectedResponseBody = objectMapper.writeValueAsString(getPatientRiskProfile());
+
+            assertThat(responseBody).isEqualTo(expectedResponseBody);
+
+        }
+
+        @Test
+        @DisplayName("should return NOT_FOUND when patient not found")
+        @WithMockUser(username = "user", roles = "DOCTOR")
+        void shouldReturnNotFoundWhenPatientNotFound() throws Exception {
+            //given
+            final Long id = 1L;
+            given(patientServiceImpl.getPatientRiskProfileById(id)).willThrow(new PatientNotFoundException("Patient not found with id: " + id));
+
+            //when & then
+            mockMvc.perform(get("/patient/{id}/risk-profile", id))
+                    .andExpect(status().isNotFound());
+        }
+
+        @Test
+        @DisplayName("should return BAD_REQUEST when id is null")
+        @WithMockUser(username = "user", roles = "DOCTOR")
+        void shouldReturnBadRequestWhenIdIsNull() throws Exception {
+            //given
+            final Long id = null;
+            given(patientServiceImpl.getPatientRiskProfileById(id)).willThrow(new IllegalArgumentException("Patient id must not be null"));
+
+            //when & then
+            mockMvc.perform(get("/patient/{id}/risk-profile", id))
+                    .andExpect(status().isBadRequest());
+        }
+
+        @Test
+        @DisplayName("should return BAD_REQUEST when id is negative")
+        @WithMockUser(username = "user", roles = "DOCTOR")
+        void shouldReturnBadRequestWhenIdIsNegative() throws Exception {
+            //given
+            final Long id = -1L;
+            given(patientServiceImpl.getPatientRiskProfileById(id)).willThrow(new IllegalArgumentException("Patient id must not be null"));
+
+            //when & then
+            mockMvc.perform(get("/patient/{id}/risk-profile", id))
+                    .andExpect(status().isBadRequest());
+        }
+    }
+
 
     // =========================
     // CREATE PATIENT
@@ -271,7 +335,6 @@ class PatientControllerTest {
         }
     }
 
-    //TODO CREATE TEST CASES
     // =========================
     // UPDATE PATIENT
     // =========================
@@ -475,6 +538,13 @@ class PatientControllerTest {
         patientDto.setAddress(address);
         patientDto.setPhoneNumber(phoneNumber);
         return patientDto;
+    }
+
+    private PatientRiskProfile getPatientRiskProfile() {
+        final PatientRiskProfile patientRiskProfile = new PatientRiskProfile();
+        patientRiskProfile.setAge(31);
+        patientRiskProfile.setGender(Gender.M);
+        return patientRiskProfile;
     }
 
 }
