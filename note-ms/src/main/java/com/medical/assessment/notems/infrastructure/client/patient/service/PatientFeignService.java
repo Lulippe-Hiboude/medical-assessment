@@ -12,14 +12,14 @@ import org.springframework.web.server.ResponseStatusException;
 public class PatientFeignService {
     private final PatientFeignClient patientFeignClient;
 
-    //TODO NEED TO CHANGE ENDPOINT RESULT TO BOOLEAN
-
     public void verifyPatientExists(final Long patientId) {
         try {
-            patientFeignClient.getPatientById(patientId);
-        } catch (FeignException.NotFound e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "Patient not found with id " + patientId + e.getMessage());
+            final boolean exist =  patientFeignClient.doesPatientExist(patientId);
+
+            if (!exist) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Patient not found with id " + patientId);
+            }
         } catch (FeignException e) {
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY,
                     "unable to verify patient with id " + patientId + e.getMessage());

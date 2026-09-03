@@ -1,8 +1,10 @@
 import {useState} from 'react';
 import type {Patient} from '../types/Patient';
 import type {Note, NoteCreateDto} from "../types/Note.ts";
+import type {RiskLevel} from "../types/Risk.ts";
 import {getPatientById} from "../services/patientService.ts";
 import {createNote, getNotesByPatientId} from "../services/NoteService.ts";
+import {getPatientRisk} from "../services/riskService.ts";
 import Layout from '../components/Layout';
 
 export default function PatientDetail() {
@@ -10,12 +12,16 @@ export default function PatientDetail() {
     const [patient, setPatient] = useState<Patient | null>(null);
     const [notes, setNotes] = useState<Note[]>([])
     const [newNoteContent, setNewNoteContent] = useState('');
+    const [risk, setRisk] = useState<RiskLevel | null>(null)
     const [error, setError] = useState('');
     const [noteError, setNoteError] = useState('');
+    const [riskError, setRiskError] = useState('');
 
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+        setRisk(null);
+        setRiskError('');
         try {
             const id = Number(patientId);
             const [patientData, notesData] = await Promise.all([
@@ -44,7 +50,18 @@ export default function PatientDetail() {
         } catch {
             setNoteError('Failed to create note');
         }
+    }
 
+    const handleGetRisk = async () => {
+        if (!patient) return;
+        setRiskError('');
+        try {
+            const riskData = await getPatientRisk(patient.id);
+            setRisk(riskData);
+        } catch {
+            setRisk(null);
+            setRiskError('Failed to fetch risk profile');
+        }
     }
 
     return (
@@ -79,6 +96,12 @@ export default function PatientDetail() {
                     <p>Genre : {patient.gender}</p>
                     <p>Adresse: {patient.address}</p>
                     <p>Téléphone: {patient.phoneNumber}</p>
+
+                    <button onClick={handleGetRisk} className="bg-blue-700 text-white px-4 py-2 rounded mt-2">
+                        Voir le profil de risque
+                    </button>
+                    {riskError && <p className="text-red-600">{riskError}</p>}
+                    {risk && <p> Risque : {risk} </p>}
 
                     <h3 className="text-lg font-semibold mt-4">Notes</h3>
                     <ul>

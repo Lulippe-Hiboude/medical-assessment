@@ -47,6 +47,10 @@ public class SecurityConfiguration {
                         .hasRole("DOCTOR")
 
                         .requestMatchers(
+                                HttpMethod.GET,"/patient/*/exists")
+                        .hasRole("DOCTOR")
+
+                        .requestMatchers(
                                 HttpMethod.GET, "/patient/*")
                         .hasAnyRole("ORGANIZER", "DOCTOR")
 

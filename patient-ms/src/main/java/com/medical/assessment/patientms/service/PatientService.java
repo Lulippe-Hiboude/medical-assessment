@@ -17,4 +17,6 @@ public interface PatientService {
     PatientDto updatePatient(Long patientId ,PatientUpdateDto patientUpdateDto);
 
     PatientRiskProfile getPatientRiskProfileById(Long patientId);
+
+    Boolean isPatientExist(Long patientId);
 }

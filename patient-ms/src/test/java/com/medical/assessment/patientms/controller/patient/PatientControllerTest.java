@@ -158,6 +158,7 @@ class PatientControllerTest {
                     .andExpect(status().isBadRequest());
         }
     }
+
     // =========================
     // GET PATIENT RISK PROFILE
     // =========================
@@ -167,7 +168,7 @@ class PatientControllerTest {
 
         @Test
         @DisplayName("should return Patient Risk Profile")
-        @WithMockUser(username = "user", roles = "ORGANIZER")
+        @WithMockUser(username = "user", roles = "DOCTOR")
         void shouldReturnPatientRiskProfile() throws Exception {
             //given
             final Long id = 1L;
@@ -224,7 +225,6 @@ class PatientControllerTest {
                     .andExpect(status().isBadRequest());
         }
     }
-
 
     // =========================
     // CREATE PATIENT
@@ -490,6 +490,50 @@ class PatientControllerTest {
             final String responseBody = result.getResponse().getContentAsString();
             assertThat(responseBody)
                     .contains("Patient not found");
+        }
+    }
+
+    // =========================
+    // VERIFY PATIENT EXITS
+    // =========================
+    @Nested
+    @DisplayName("verify patient exists")
+    class verifyPatientExists {
+
+        @Test
+        @DisplayName("should return true if patient exists")
+        @WithMockUser(username = "user", roles = "DOCTOR")
+        void shouldReturnTrueWhenPatientExists() throws Exception {
+            //given
+            final Long id = 1L;
+            given(patientServiceImpl.isPatientExist(id)).willReturn(true);
+
+            //when & then
+            final MvcResult result = mockMvc.perform(get("/patient/{id}/exists", id))
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+            final String responseBody = result.getResponse().getContentAsString();
+
+            assertThat(responseBody).isEqualTo("true");
+        }
+
+        @Test
+        @DisplayName("should return false if patient exists")
+        @WithMockUser(username = "user", roles = "DOCTOR")
+        void shouldReturnFalseWhenPatientExists() throws Exception {
+            //given
+            final Long id = 1L;
+            given(patientServiceImpl.isPatientExist(id)).willReturn(false);
+
+            //when & then
+            final MvcResult result = mockMvc.perform(get("/patient/{id}/exists", id))
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+            final String responseBody = result.getResponse().getContentAsString();
+
+            assertThat(responseBody).isEqualTo("false");
         }
     }
 

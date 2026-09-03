@@ -8,7 +8,8 @@ application:
 
 
 patientms:
-    url: "http://localhost:8081"
+    name: ${PATIENT_MS_NAME:patient-ms}
+    url: ${PATIENT_MS_URL:http://localhost:8081}
 
 spring:
     application:
