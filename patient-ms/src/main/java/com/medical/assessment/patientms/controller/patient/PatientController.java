@@ -40,6 +40,12 @@ public class PatientController implements PatientApi {
     }
 
     @Override
+    public ResponseEntity<Boolean> isPatientExists(final Long id) {
+        log.info("verify if patient exists for {}", id);
+        return ResponseEntity.ok(patientService.isPatientExist(id));
+    }
+
+    @Override
     public ResponseEntity<PatientDto> updatePatient(Long id, PatientUpdateDto patientUpdateDto) {
         log.info("update patient");
         final PatientDto patientDto = patientService.updatePatient(id, patientUpdateDto);

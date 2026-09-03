@@ -204,6 +204,40 @@ public class PatientControllerIT {
 
     }
 
+    @Test
+    @DisplayName("should return true if patient exists")
+    void shouldReturnTrueIfPatientExists() throws Exception {
+        //given
+        final String token = jwtService.generateToken("doctor", "DOCTOR");
+        final Long id = 1L;
+
+        //when
+        final MvcResult result = mockMvc.perform(get("/patient/{id}/exists", id)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andReturn();
+        //then
+        final String responseBody = result.getResponse().getContentAsString();
+        assertThat(responseBody).isEqualTo("true");
+    }
+
+    @Test
+    @DisplayName("should return false if patient does not exist")
+    void shouldReturnFalseIfPatientDoesNotExist() throws Exception {
+        //given
+        final String token = jwtService.generateToken("doctor", "DOCTOR");
+        final Long id = 18L;
+
+        //when
+        final MvcResult result = mockMvc.perform(get("/patient/{id}/exists", id)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andReturn();
+        //then
+        final String responseBody = result.getResponse().getContentAsString();
+        assertThat(responseBody).isEqualTo("false");
+    }
+
     private static PatientCreateDto getPatientCreateDto(final String firstName,
                                                         final String lastName,
                                                         final LocalDate birthDate,

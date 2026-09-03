@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(
-        name = "patient-ms",
-        url = "http://localhost:8081"
+        name = "${patientms.name}",
+        url = "${patientms.url}"
 )
 public interface PatientFeignClient {
 

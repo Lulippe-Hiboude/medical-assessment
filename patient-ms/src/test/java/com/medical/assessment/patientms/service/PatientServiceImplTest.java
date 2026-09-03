@@ -423,6 +423,10 @@ class PatientServiceImplTest {
         }
     }
 
+    // =========================
+    // GET PATIENT RISK PROFILE
+    // =========================
+
     @Nested
     @DisplayName("get Patient Risk Profile")
     class getPatientRiskProfile {
@@ -484,6 +488,55 @@ class PatientServiceImplTest {
             assertThat(patientRiskProfile).isNotNull();
             final Integer expected = Period.between(patient.getBirthDate(), LocalDate.now()).getYears();
             assertThat(patientRiskProfile.getAge()).isEqualTo(expected);
+        }
+    }
+
+    // =========================
+    // VERIFY PATIENT EXISTS
+    // =========================
+
+    @Nested
+    @DisplayName("verify patient exists")
+    class verifyPatientExists {
+        @Test
+        @DisplayName("should return true when patient exists")
+        void shouldReturnTrueWhenPatientExists() {
+            //given
+            final long id = 1L;
+            given(patientRepository.existsById(id)).willReturn(true);
+
+            //when
+            final Boolean doesExist = patientServiceImpl.isPatientExist(id);
+
+            //then
+            assertThat(doesExist).isTrue();
+        }
+
+        @Test
+        @DisplayName("should return false when patient does not exist")
+        void shouldReturnTrueWhenPatientDoesNotExist() {
+            //given
+            final long id = 1L;
+            given(patientRepository.existsById(id)).willReturn(false);
+
+            //when
+            final Boolean doesExist = patientServiceImpl.isPatientExist(id);
+
+            //then
+            assertThat(doesExist).isFalse();
+        }
+
+        @Test
+        @DisplayName("should return false if id is null")
+        void shouldReturnFalseIfIdIsNull() {
+            //given
+            final Long id = null;
+
+            //when
+            final Boolean doesExist = patientServiceImpl.isPatientExist(id);
+
+            //then
+            assertThat(doesExist).isFalse();
         }
     }
 

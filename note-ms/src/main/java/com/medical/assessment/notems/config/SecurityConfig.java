@@ -47,6 +47,10 @@ public class SecurityConfig {
                         .hasRole("DOCTOR")
 
                         .requestMatchers(
+                                HttpMethod.GET, "/notes/patient/*/note-content")
+                        .hasRole("DOCTOR")
+
+                        .requestMatchers(
                                 HttpMethod.POST, "/notes")
                         .hasRole("DOCTOR")
 

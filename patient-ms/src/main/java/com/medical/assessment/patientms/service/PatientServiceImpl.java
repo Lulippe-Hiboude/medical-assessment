@@ -87,6 +87,13 @@ public class PatientServiceImpl implements PatientService {
         return PatientMapper.INSTANCE.toPatientRiskProfile(patient.getGender(),age);
     }
 
+    @Override
+    public Boolean isPatientExist(final Long patientId) {
+        log.info("Checking if patient exists");
+
+        return patientRepository.existsById(patientId);
+    }
+
     private int calculatePatientAge(final LocalDate birthDate) {
         final LocalDate today = LocalDate.now();
         return Period.between(birthDate, today).getYears();

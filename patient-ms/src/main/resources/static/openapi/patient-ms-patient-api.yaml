@@ -169,6 +169,28 @@ paths:
             text/plain:
               schema:
                 type: string
+  /patient/{id}/exists:
+    get:
+      tags:
+        - patient
+      summary: verify the existence of a patient by id
+      operationId: isPatientExists
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: the id of the patient being queried
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: Return whether the patient exists
+          content:
+            application/json:
+              schema:
+                type: boolean
 
 components:
   schemas:

@@ -7,8 +7,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.util.List;
 
 @FeignClient(
-        name = "note-ms",
-        url = "http://localhost:8083")
+        name = "${notems.name}",
+        url = "${notems.url}"
+)
 public interface NoteFeignClient {
     @GetMapping("/notes/patient/{id}/note-content")
     List<String> getNoteContentList(@PathVariable("id") final Long id);
