@@ -1,0 +1,34 @@
+server:
+  port: 8084
+  servlet:
+    context-path: /
+
+application:
+  title: Risk Management System
+  version: 1.0.0
+
+
+patientms:
+  url: "http://localhost:8081"
+
+notems:
+ url: "http://localhost:8082"
+
+spring:
+  application:
+    name: note-ms
+  main:
+    banner-mode: console
+  banner:
+    charset: UTF-8
+    location: banner.txt
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 3600000
