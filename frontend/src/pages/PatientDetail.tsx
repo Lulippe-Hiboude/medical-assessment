@@ -2,13 +2,14 @@ import {useState} from 'react';
 import type {Patient} from '../types/Patient';
 import type {Note, NoteCreateDto} from "../types/Note.ts";
 import type {RiskLevel} from "../types/Risk.ts";
+import {RISK_LABELS} from "../types/Risk.ts";
 import {getPatientById} from "../services/patientService.ts";
 import {createNote, getNotesByPatientId} from "../services/NoteService.ts";
 import {getPatientRisk} from "../services/riskService.ts";
 import Layout from '../components/Layout';
 
 export default function PatientDetail() {
-    const [patientId, setPatientid] = useState('');
+    const [patientId, setPatientId] = useState('');
     const [patient, setPatient] = useState<Patient | null>(null);
     const [notes, setNotes] = useState<Note[]>([])
     const [newNoteContent, setNewNoteContent] = useState('');
@@ -80,7 +81,7 @@ export default function PatientDetail() {
                 <input type="number"
                        placeholder="ID du patient"
                        value={patientId}
-                       onChange={e => setPatientid(e.target.value)}
+                       onChange={e => setPatientId(e.target.value)}
                 />
                 <button type="submit" className="bg-blue-700 text-white px-4 py-2 rounded">
                     Rechercher
@@ -101,7 +102,7 @@ export default function PatientDetail() {
                         Voir le profil de risque
                     </button>
                     {riskError && <p className="text-red-600">{riskError}</p>}
-                    {risk && <p> Risque : {risk} </p>}
+                    {risk && <p> Risque : {RISK_LABELS[risk]} </p>}
 
                     <h3 className="text-lg font-semibold mt-4">Notes</h3>
                     <ul>
