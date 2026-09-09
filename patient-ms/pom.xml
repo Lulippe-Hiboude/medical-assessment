@@ -204,44 +204,6 @@
 
                     <executions>
                         <execution>
-                            <id>authenticate</id>
-                            <goals>
-                                <goal>generate</goal>
-                            </goals>
-
-                            <configuration>
-                                <inputSpec>
-                                    ${project.basedir}/src/main/resources/static/openapi/patient-ms-authentification-api.yaml
-                                </inputSpec>
-
-                                <apiPackage>com.medical.assessment.patientms.authentification.api</apiPackage>
-                                <modelPackage>com.medical.assessment.patientms.authentification.model</modelPackage>
-
-                                <generatorName>spring</generatorName>
-
-                                <generateModelTests>false</generateModelTests>
-                                <generateModelDocumentation>false</generateModelDocumentation>
-                                <generateApiTests>false</generateApiTests>
-                                <generateSupportingFiles>false</generateSupportingFiles>
-
-                                <configOptions>
-                                    <useTags>true</useTags>
-                                    <useSpringBoot3>true</useSpringBoot3>
-                                    <skipDefaultInterface>true</skipDefaultInterface>
-                                    <interfaceOnly>true</interfaceOnly>
-                                    <returnResponse>true</returnResponse>
-                                </configOptions>
-
-                                <additionalProperties>
-                                    <additionalProperty>
-                                        removeEnumValuePrefix=false
-                                    </additionalProperty>
-                                </additionalProperties>
-
-                            </configuration>
-                        </execution>
-
-                        <execution>
                             <id>patient</id>
                             <goals>
                                 <goal>generate</goal>
