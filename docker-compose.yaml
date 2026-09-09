@@ -1,14 +1,109 @@
 services:
-  gateway:
+  auth-ms:
+    build:
+      context: .
+      dockerfile: auth-ms/Dockerfile
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+    networks:
+      - internal
+  frontend:
+    build:
+      context: ./frontend
     ports:
-      - "8080:8080"
+      - "3000:80"
+    depends_on:
+      - gateway
+    networks:
+      - public
+  gateway:
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
+    ports:
+     - "8080:8080"
+    environment:
+      PATIENT_MS_URL: ${PATIENT_MS_URL}
+      AUTH_MS_URL: ${AUTH_MS_URL}
+      NOTE_MS_URL: ${NOTE_MS_URL}
+      RISK_MS_URL: ${RISK_MS_URL}
     networks:
       - public
       - internal
-  patient-ms:
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    volumes:
+      - notes-mongo-data:/data/db
+      - ./mongo/init.js:/docker-entrypoint-initdb.d/init.js
     networks:
       - internal
+  note-ms:
+    build:
+      context: .
+      dockerfile: note-ms/Dockerfile
+    environment:
+      MONGO_HOST: ${MONGO_HOST}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      PATIENT_MS_NAME: ${PATIENT_MS_NAME}
+      PATIENT_MS_URL: ${PATIENT_MS_URL}
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      - mongo
+      - patient-ms
+    networks:
+      - internal
+  patient-ms:
+    build:
+      context: .
+      dockerfile: patient-ms/Dockerfile
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      - postgres
+    networks:
+      - internal
+  postgres:
+    ports:
+      - "5432:5432"
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - internal
+  risk-ms:
+    build:
+      context: .
+      dockerfile: risk-ms/Dockerfile
+    environment:
+      PATIENT_MS_NAME: ${PATIENT_MS_NAME}
+      PATIENT_MS_URL: ${PATIENT_MS_URL}
+      NOTE_MS_NAME: ${NOTE_MS_NAME}
+      NOTE_MS_URL: ${NOTE_MS_URL}
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      - patient-ms
+      - note-ms
+    networks:
+      - internal
+
 networks:
   public:
   internal:
     internal: true
+volumes:
+  postgres-data:
+  notes-mongo-data:
