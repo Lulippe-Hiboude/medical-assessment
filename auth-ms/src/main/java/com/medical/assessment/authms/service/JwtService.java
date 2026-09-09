@@ -32,6 +32,7 @@ public class JwtService {
                 .signWith(getSignKey(secretKey),Jwts.SIG.HS256)
                 .compact();
     }
+
     private SecretKey getSignKey(final String secretKey) {
         final byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return hmacShaKeyFor(keyBytes);

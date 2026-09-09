@@ -12,9 +12,7 @@ import static java.util.Optional.ofNullable;
 @Service
 @RequiredArgsConstructor
 public class CustomUserDetailService implements UserDetailsService {
-
     private final InMemoryUserRepository userRepository;
-
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
