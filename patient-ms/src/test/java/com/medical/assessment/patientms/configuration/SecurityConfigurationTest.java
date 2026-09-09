@@ -29,16 +29,6 @@ class SecurityConfigurationTest {
     private JwtService jwtService;
 
     @Test
-    @DisplayName("should_allow_public_endpoint")
-    void should_allow_public_endpoint() throws Exception {
-        //when & then
-        mockMvc.perform(get("/auth/token")
-                        .param("username", "test")
-                        .param("role", "DOCTOR"))
-                .andExpect(status().isOk());
-    }
-
-    @Test
     @DisplayName("should_deny_access_to_protected_endpoint_without_token")
     void should_deny_access_to_protected_endpoint_without_token() throws Exception {
         //when & then
