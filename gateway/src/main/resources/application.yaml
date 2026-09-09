@@ -20,18 +20,18 @@ spring:
         webflux:
           routes:
             - id: patient-ms
-              uri : http://localhost:8081
+              uri : ${PATIENT_MS_URL:http://localhost:8081}
               predicates:
                 - Path=/patient/**
             - id: auth-ms
-              uri : http://localhost:8082
+              uri : ${AUTH_MS_URL:http://localhost:8082}
               predicates:
                 - Path=/auth/**
             - id: note-ms
-              uri : http://localhost:8083
+              uri : ${NOTE_MS_URL:http://localhost:8083}
               predicates:
                 - Path=/notes/**
             - id: risk-ms
-              uri: http://localhost:8084
+              uri: ${RISK_MS_URL:http://localhost:8084}
               predicates:
                 - Path=/risk/**

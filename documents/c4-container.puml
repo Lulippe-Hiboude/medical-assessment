@@ -1,0 +1,53 @@
+plantuml
+
+  @startuml
+  !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+  LAYOUT_LEFT_RIGHT()
+
+  title Medical Assessment Platform - C4 Container
+
+  ' ========================
+
+  ' STYLE
+
+  ' ========================
+
+  UpdateElementStyle(person, $bgColor="#6CB5C3", $borderColor="#000000", $fontColor="#12288A")
+  UpdateElementStyle(containerDb, $bgColor="#247F2A", $borderColor="#247F2A", $fontColor="#247F2A")
+  Person(organizer, "Organizer")
+  Person(doctor, "Doctor")
+
+  System_Boundary(system, "Medical Assessment Platform") {
+
+      Container(front, "front", "React", "Medical UI")
+
+      Container(gateway, "gateway", "Spring Cloud Gateway", "API Gateway - pure relay (no JWT validation, forwards Authorization header as-is)")
+
+      Container(auth, "auth-ms", "Spring Boot + Spring Security", "Authentication & JWT issuance")
+      Container(patient, "patient-ms", "Spring Boot + JPA", "Patient management")
+      Container(note, "note-ms", "Spring Boot + MongoDB", "Note management")
+      Container(risk, "risk-ms", "Spring Boot", "Diabetes risk level computation")
+
+      ContainerDb(patientDb, "Patient DB", "PostgreSQL")
+      ContainerDb(noteDb, "Note DB", "MongoDB")
+  }
+
+  Rel(organizer, front, "Use")
+  Rel(doctor, front, "Use")
+
+  Rel(front, gateway, "API calls (JWT in Authorization header)")
+
+  Rel(gateway, auth, "Route")
+  Rel(gateway, patient, "Route")
+  Rel(gateway, note, "Route")
+  Rel(gateway, risk, "Route")
+
+  Rel(patient, patientDb, "CRUD")
+  Rel(note, noteDb, "CRUD")
+
+  Rel(risk, patient, "REST API (Feign) - age & gender")
+  Rel(risk, note, "REST API (Feign) - notes")
+  Rel(note, patient, "REST API (Feign) - patient existence check")
+
+  @enduml
