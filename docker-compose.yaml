@@ -41,6 +41,7 @@ services:
       - notes-mongo-data:/data/db
       - ./mongo/init.js:/docker-entrypoint-initdb.d/init.js
     networks:
+      - public
       - internal
   note-ms:
     build:
@@ -83,6 +84,7 @@ services:
       - postgres-data:/var/lib/postgresql/data
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
+      - public
       - internal
   risk-ms:
     build:
