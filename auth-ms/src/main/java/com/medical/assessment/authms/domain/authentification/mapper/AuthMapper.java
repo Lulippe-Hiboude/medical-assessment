@@ -1,4 +1,4 @@
-package com.medical.assessment.authms.mapper;
+package com.medical.assessment.authms.domain.authentification.mapper;
 
 import com.medical.assessment.authms.authentification.model.AuthResponse;
 import org.mapstruct.BeanMapping;

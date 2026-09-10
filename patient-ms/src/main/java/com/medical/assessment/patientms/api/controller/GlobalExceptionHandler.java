@@ -1,4 +1,4 @@
-package com.medical.assessment.patientms.controller;
+package com.medical.assessment.patientms.api.controller;
 
 import com.medical.assessment.patientms.exception.PatientAlreadyExistsException;
 import com.medical.assessment.patientms.exception.PatientNotFoundException;

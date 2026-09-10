@@ -1,4 +1,4 @@
-package com.medical.assessment.authms.controller;
+package com.medical.assessment.authms.api.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

@@ -1,4 +1,4 @@
-package com.medical.assessment.patientms.mapper;
+package com.medical.assessment.patientms.domain.patient.mapper;
 
 import com.medical.assessment.patientms.patient.model.PatientCreateDto;
 import com.medical.assessment.patientms.patient.model.PatientDto;

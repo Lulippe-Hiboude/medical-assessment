@@ -25,7 +25,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class NoteServiceTest {
+class NoteServiceImplTest {
 
     @Mock
     private NoteRepository noteRepository;
@@ -34,7 +34,7 @@ class NoteServiceTest {
     private PatientFeignService patientFeignService;
 
     @InjectMocks
-    private NoteService noteService;
+    private NoteServiceImpl noteServiceImpl;
 
     @Test
     @DisplayName("Should create a note successfully")
@@ -54,7 +54,7 @@ class NoteServiceTest {
         given(noteRepository.save(any(Note.class))).willReturn(expected);
 
         //when
-        final NoteDto result = noteService.createNote(noteCreateDto);
+        final NoteDto result = noteServiceImpl.createNote(noteCreateDto);
 
         //then
         verify(noteRepository, times(1)).save(any(Note.class));
@@ -76,7 +76,7 @@ class NoteServiceTest {
                 .given(patientFeignService).verifyPatientExists(noteCreateDto.getPatientId());
 
         //when & then
-        assertThrows(ResponseStatusException.class, () -> noteService.createNote(noteCreateDto));
+        assertThrows(ResponseStatusException.class, () -> noteServiceImpl.createNote(noteCreateDto));
         verify(noteRepository, never()).save(any(Note.class));
     }
 
@@ -92,7 +92,7 @@ class NoteServiceTest {
                 .given(patientFeignService).verifyPatientExists(noteCreateDto.getPatientId());
 
         //when & then
-        assertThrows(ResponseStatusException.class, () -> noteService.createNote(noteCreateDto));
+        assertThrows(ResponseStatusException.class, () -> noteServiceImpl.createNote(noteCreateDto));
         verify(noteRepository, never()).save(any(Note.class));
     }
 
@@ -118,7 +118,7 @@ class NoteServiceTest {
 
 
         //when
-        List<NoteDto> result = noteService.getNotesByPatientId(1L);
+        List<NoteDto> result = noteServiceImpl.getNotesByPatientId(1L);
 
         //then
         verify(noteRepository, times(1)).findByPatientIdOrderByCreatedAtDesc("1");
@@ -137,7 +137,7 @@ class NoteServiceTest {
         given(noteRepository.findByPatientIdOrderByCreatedAtDesc("1")).willReturn(List.of());
 
         //when
-        List<NoteDto> result = noteService.getNotesByPatientId(1L);
+        List<NoteDto> result = noteServiceImpl.getNotesByPatientId(1L);
 
         //then
         verify(noteRepository, times(1)).findByPatientIdOrderByCreatedAtDesc("1");
@@ -152,7 +152,7 @@ class NoteServiceTest {
         given(noteRepository.findByPatientIdOrderByCreatedAtDesc("1")).willReturn(List.of());
 
         //when
-        List<String> result = noteService.getNotesContentByPatientId(1L);
+        List<String> result = noteServiceImpl.getNotesContentByPatientId(1L);
 
         //then
         verify(noteRepository, times(1)).findByPatientIdOrderByCreatedAtDesc("1");
@@ -181,7 +181,7 @@ class NoteServiceTest {
         given(noteRepository.findByPatientIdOrderByCreatedAtDesc("1")).willReturn(notes);
 
         //when
-        List<String> result = noteService.getNotesContentByPatientId(1L);
+        List<String> result = noteServiceImpl.getNotesContentByPatientId(1L);
 
         //then
         verify(noteRepository, times(1)).findByPatientIdOrderByCreatedAtDesc("1");

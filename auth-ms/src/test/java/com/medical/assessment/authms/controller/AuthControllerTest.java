@@ -1,10 +1,11 @@
 package com.medical.assessment.authms.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.medical.assessment.authms.api.controller.AuthController;
 import com.medical.assessment.authms.authentification.model.AuthRequest;
 import com.medical.assessment.authms.authentification.model.AuthResponse;
 import com.medical.assessment.authms.configuration.SecurityConfiguration;
-import com.medical.assessment.authms.service.AuthService;
+import com.medical.assessment.authms.domain.authentification.service.AuthService;
 import com.medical.assessment.authms.service.JwtService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -5,7 +5,7 @@ import com.medical.assessment.patientms.patient.model.*;
 import com.medical.assessment.patientms.persistence.entity.Patient;
 import com.medical.assessment.patientms.persistence.repository.PatientRepository;
 import com.medical.assessment.patientms.security.jwt.JwtService;
-import com.medical.assessment.patientms.service.PatientServiceImpl;
+import com.medical.assessment.patientms.domain.patient.service.PatientServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -1,8 +1,8 @@
-package com.medical.assessment.patientms.service;
+package com.medical.assessment.patientms.domain.patient.service;
 
 import com.medical.assessment.patientms.exception.PatientAlreadyExistsException;
 import com.medical.assessment.patientms.exception.PatientNotFoundException;
-import com.medical.assessment.patientms.mapper.PatientMapper;
+import com.medical.assessment.patientms.domain.patient.mapper.PatientMapper;
 import com.medical.assessment.patientms.patient.model.PatientCreateDto;
 import com.medical.assessment.patientms.patient.model.PatientDto;
 import com.medical.assessment.patientms.patient.model.PatientRiskProfile;
@@ -21,9 +21,6 @@ import java.time.Period;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
-
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
 
 @Service
 @RequiredArgsConstructor
