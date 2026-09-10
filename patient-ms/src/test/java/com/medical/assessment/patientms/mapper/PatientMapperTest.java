@@ -1,5 +1,6 @@
 package com.medical.assessment.patientms.mapper;
 
+import com.medical.assessment.patientms.domain.patient.mapper.PatientMapper;
 import com.medical.assessment.patientms.patient.model.PatientCreateDto;
 import com.medical.assessment.patientms.patient.model.PatientDto;
 import com.medical.assessment.patientms.patient.model.PatientUpdateDto;
@@ -7,7 +8,6 @@ import com.medical.assessment.patientms.persistence.entity.Patient;
 import com.medical.assessment.patientms.persistence.enums.Gender;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.core.parameters.P;
 
 import java.time.LocalDate;
 

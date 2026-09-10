@@ -1,9 +1,9 @@
-package com.medical.assessment.authms.controller;
+package com.medical.assessment.authms.api.controller;
 
 import com.medical.assessment.authms.authentification.api.AuthentificationApi;
 import com.medical.assessment.authms.authentification.model.AuthRequest;
 import com.medical.assessment.authms.authentification.model.AuthResponse;
-import com.medical.assessment.authms.service.AuthService;
+import com.medical.assessment.authms.domain.authentification.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

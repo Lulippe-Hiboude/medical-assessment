@@ -1,5 +1,6 @@
 package com.medical.assessment.authms.service;
 
+import com.medical.assessment.authms.domain.user_details.CustomUserDetailService;
 import com.medical.assessment.authms.repository.InMemoryUserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -2,6 +2,8 @@ package com.medical.assessment.authms.service;
 
 import com.medical.assessment.authms.authentification.model.AuthRequest;
 import com.medical.assessment.authms.authentification.model.AuthResponse;
+import com.medical.assessment.authms.domain.authentification.service.AuthServiceImpl;
+import com.medical.assessment.authms.domain.user_details.CustomUserDetailService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,7 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
-class AuthServiceTest {
+class AuthServiceImplTest {
     @Mock
     private CustomUserDetailService userDetailService;
 
@@ -33,7 +35,7 @@ class AuthServiceTest {
     private PasswordEncoder passwordEncoder;
 
     @InjectMocks
-    private AuthService authService;
+    private AuthServiceImpl authServiceImpl;
 
     @Test
     @DisplayName("should return token when credentials are valid")
@@ -57,7 +59,7 @@ class AuthServiceTest {
         given(jwtService.generateToken(doctor, List.of("DOCTOR"))).willReturn(mockedToken);
 
         //when
-        final AuthResponse authResponse = authService.authenticateUser(authRequest);
+        final AuthResponse authResponse = authServiceImpl.authenticateUser(authRequest);
 
         //then
         assertThat(authResponse).isNotNull();
@@ -85,7 +87,7 @@ class AuthServiceTest {
         given(passwordEncoder.matches(invalidPassword, userDetails.getPassword())).willReturn(false);
 
         //when & then
-        assertThrows(BadCredentialsException.class, () -> authService.authenticateUser(authRequest));
+        assertThrows(BadCredentialsException.class, () -> authServiceImpl.authenticateUser(authRequest));
         verifyNoInteractions(jwtService);
     }
 

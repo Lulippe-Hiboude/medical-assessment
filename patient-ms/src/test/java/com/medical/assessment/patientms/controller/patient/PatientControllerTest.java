@@ -1,11 +1,12 @@
 package com.medical.assessment.patientms.controller.patient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.medical.assessment.patientms.api.controller.patient.PatientController;
 import com.medical.assessment.patientms.exception.PatientAlreadyExistsException;
 import com.medical.assessment.patientms.exception.PatientNotFoundException;
 import com.medical.assessment.patientms.patient.model.*;
 import com.medical.assessment.patientms.security.jwt.JwtService;
-import com.medical.assessment.patientms.service.PatientServiceImpl;
+import com.medical.assessment.patientms.domain.patient.service.PatientServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

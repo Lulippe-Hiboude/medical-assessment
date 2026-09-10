@@ -1,8 +1,10 @@
-package com.medical.assessment.authms.service;
+package com.medical.assessment.authms.domain.authentification.service;
 
 import com.medical.assessment.authms.authentification.model.AuthRequest;
 import com.medical.assessment.authms.authentification.model.AuthResponse;
-import com.medical.assessment.authms.mapper.AuthMapper;
+import com.medical.assessment.authms.domain.user_details.CustomUserDetailService;
+import com.medical.assessment.authms.domain.authentification.mapper.AuthMapper;
+import com.medical.assessment.authms.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -17,7 +19,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class AuthService {
+public class AuthServiceImpl implements AuthService {
 
     private final CustomUserDetailService userDetailService;
     private final JwtService jwtService;

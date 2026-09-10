@@ -1,5 +1,6 @@
 package com.medical.assessment.patientms.service;
 
+import com.medical.assessment.patientms.domain.patient.service.PatientServiceImpl;
 import com.medical.assessment.patientms.exception.PatientAlreadyExistsException;
 import com.medical.assessment.patientms.exception.PatientNotFoundException;
 import com.medical.assessment.patientms.patient.model.PatientCreateDto;

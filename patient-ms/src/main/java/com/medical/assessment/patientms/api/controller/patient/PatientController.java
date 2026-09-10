@@ -1,11 +1,11 @@
-package com.medical.assessment.patientms.controller.patient;
+package com.medical.assessment.patientms.api.controller.patient;
 
 import com.medical.assessment.patientms.patient.api.PatientApi;
 import com.medical.assessment.patientms.patient.model.PatientCreateDto;
 import com.medical.assessment.patientms.patient.model.PatientDto;
 import com.medical.assessment.patientms.patient.model.PatientRiskProfile;
 import com.medical.assessment.patientms.patient.model.PatientUpdateDto;
-import com.medical.assessment.patientms.service.PatientService;
+import com.medical.assessment.patientms.domain.patient.service.PatientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

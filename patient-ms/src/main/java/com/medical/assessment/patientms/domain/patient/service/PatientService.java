@@ -1,4 +1,4 @@
-package com.medical.assessment.patientms.service;
+package com.medical.assessment.patientms.domain.patient.service;
 
 import com.medical.assessment.patientms.patient.model.PatientCreateDto;
 import com.medical.assessment.patientms.patient.model.PatientDto;

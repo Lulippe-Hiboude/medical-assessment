@@ -227,7 +227,7 @@ components:
         phoneNumber:
           type: string
           description: "the phone number of the patient"
-          example: "0123456789"
+          example: "012-345-6789"
     PatientCreateDto:
       type: object
       properties:

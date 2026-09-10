@@ -1,4 +1,4 @@
-package com.medical.assessment.authms.service;
+package com.medical.assessment.authms.domain.user_details;
 
 import com.medical.assessment.authms.repository.InMemoryUserRepository;
 import lombok.RequiredArgsConstructor;
