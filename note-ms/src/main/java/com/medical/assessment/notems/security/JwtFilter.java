@@ -24,6 +24,25 @@ import static java.util.Collections.singletonList;
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
 
+    /**
+     * Processes the JWT bearer token contained in the HTTP {@code Authorization}
+     * header.
+     *
+     * <p>If the request does not contain a bearer token, the request is passed
+     * through the filter chain without authentication. When a token is present,
+     * it is extracted and used to authenticate the current request.</p>
+     *
+     * <p>If an error occurs while processing the JWT, the security context is
+     * cleared and the request continues through the filter chain. Spring Security
+     * is then responsible for handling the request as unauthenticated or
+     * unauthorized according to the configured security rules.</p>
+     *
+     * @param request the incoming HTTP request
+     * @param response the HTTP response
+     * @param filterChain the filter chain used to continue request processing
+     * @throws ServletException if an error occurs during servlet processing
+     * @throws IOException if an I/O error occurs while processing the request
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     @NonNull HttpServletResponse response,

@@ -21,6 +21,29 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     private final JwtFilter jwtFilter;
 
+    /**
+     * Configures the application's Spring Security filter chain.
+     *
+     * <p>The security configuration:</p>
+     * <ul>
+     *     <li>disables CSRF protection because the API uses stateless JWT authentication;</li>
+     *     <li>disables HTTP sessions by configuring {@link SessionCreationPolicy#STATELESS};</li>
+     *     <li>allows unauthenticated access to Swagger and OpenAPI resources;</li>
+     *     <li>requires the {@code DOCTOR} role to create notes;</li>
+     *     <li>requires the {@code DOCTOR} role to retrieve patient notes;</li>
+     *     <li>requires authentication for all other endpoints;</li>
+     *     <li>returns HTTP {@code 401 UNAUTHORIZED} when authentication is required
+     *         but not provided;</li>
+     *     <li>returns HTTP {@code 403 FORBIDDEN} when the authenticated user does
+     *         not have sufficient permissions;</li>
+     *     <li>registers the JWT filter before Spring Security's
+     *         {@link UsernamePasswordAuthenticationFilter}.</li>
+     * </ul>
+     *
+     * @param http the {@link HttpSecurity} instance used to configure web security
+     * @return the configured {@link SecurityFilterChain}
+     * @throws Exception if an error occurs while configuring the security filter chain
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http

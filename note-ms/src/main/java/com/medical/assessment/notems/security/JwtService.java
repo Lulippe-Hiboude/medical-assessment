@@ -25,12 +25,29 @@ public class JwtService {
     @Value("${jwt.expiration}")
     private long expirationDate;
 
+    /**
+     * Extracts the user's role from a JWT token.
+     *
+     * <p>The role is retrieved from the {@code roles} claim of the token
+     * and converted to the corresponding {@link Role} value.</p>
+     *
+     * @param token the JWT token containing the user's roles
+     * @return the user's {@link Role}
+     */
     public Role extractRole(final String token) {
         final List<String> roles = extractClaims(token).get("roles", List.class);
         log.debug("Extracted roles from token: {}", roles);
         return Role.fromValue(roles.getFirst());
     }
 
+    /**
+     * Extracts the username from a JWT token.
+     *
+     * <p>The username is retrieved from the subject claim of the token.</p>
+     *
+     * @param token the JWT token containing the username
+     * @return the username stored in the token
+     */
     public String extractUsername(final String token) {
         return extractClaims(token).getSubject();
     }

@@ -12,6 +12,21 @@ import org.springframework.web.server.ResponseStatusException;
 public class PatientFeignService {
     private final PatientFeignClient patientFeignClient;
 
+    /**
+     * Verifies that a patient exists in the patient service.
+     *
+     * <p>The verification is performed through the patient service using
+     * a Feign client. If the patient does not exist, a {@code 404 NOT FOUND}
+     * response status exception is thrown. If the patient service cannot
+     * be reached or returns a Feign error, a {@code 502 BAD GATEWAY}
+     * response status exception is thrown.</p>
+     *
+     * @param patientId the unique identifier of the patient to verify
+     * @throws ResponseStatusException with {@link HttpStatus#NOT_FOUND} if
+     *         the patient does not exist
+     * @throws ResponseStatusException with {@link HttpStatus#BAD_GATEWAY} if
+     *         the patient cannot be verified because of a Feign client error
+     */
     public void verifyPatientExists(final Long patientId) {
         try {
             final boolean exist =  patientFeignClient.doesPatientExist(patientId);

@@ -21,6 +21,17 @@ public class JwtService {
     @Value("${jwt.expiration}")
     private long expirationDate;
 
+    /**
+     * Generates a signed JWT token for the specified user.
+     *
+     * <p>The generated token contains the username as its subject and the user's
+     * roles as a custom claim. The token also includes its issue date and expiration
+     * date and is signed using the configured secret key with the HS256 algorithm.</p>
+     *
+     * @param username the username to include as the JWT subject
+     * @param roles the roles to include in the JWT {@code roles} claim
+     * @return a signed and compact JWT token
+     */
     public String generateToken(final String username, final List<String> roles) {
         final Date now = new Date();
         final Date expiration = new Date(now.getTime() + expirationDate);

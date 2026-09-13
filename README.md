@@ -94,7 +94,7 @@ Other networks run on an internal Docker network and are not reachable directly 
 
 3. Start the application using Docker Compose:
    ```bash
-   docker-compose up --build
+   docker compose up --build
    ```
    
 4. Access the application:
@@ -126,7 +126,7 @@ Minimum coverage required is 80% for each microservice.
 
 To stop the application and remove the containers, run:
 ```bash
-docker-compose down
+docker compose down
 ```
 
 ## Green Code
@@ -148,3 +148,4 @@ Concretely it means avoiding unnecessary computation, unnecessary network calls,
 - **Database query optimization**: select only the required fields instead of fetching entire entities when not needed.
 - **Right-sized container resources**: configure Docker containers with appropriate CPU and memory limits to avoid over-provisioning.
 - **Lower logging level in production**: avoid verbose logging in production to reduce I/O and disk usage. For example, set logging level to WARN or ERROR in production instead of DEBUG and keep DEBUG only for development and troubleshooting.
+- **HTTP response compression** : (gzip) on each service to reduce data transferred to frontend

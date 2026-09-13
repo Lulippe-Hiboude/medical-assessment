@@ -28,12 +28,14 @@ import java.util.stream.Stream;
 public class PatientServiceImpl implements PatientService {
     private final PatientRepository patientRepository;
 
+    @Override
     public PatientDto getPatientById(final Long id) {
         log.debug("Getting patient with id {}", id);
         final Patient patient = findPatientByPatientId(id);
         return PatientMapper.INSTANCE.toPatientDto(patient);
     }
 
+    @Override
     public List<PatientDto> getAllPatients() {
         log.debug("Getting all patients");
         return patientRepository.findAll()
@@ -42,6 +44,7 @@ public class PatientServiceImpl implements PatientService {
                 .toList();
     }
 
+    @Override
     @Transactional
     public PatientDto createPatient(final PatientCreateDto patientCreateDto) {
         log.debug("Creating patient");
@@ -54,6 +57,7 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Override
+    @Transactional
     public PatientDto updatePatient(final Long patientId, final PatientUpdateDto patientUpdateDto) {
 
         if(Objects.isNull(patientUpdateDto)){

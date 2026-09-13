@@ -13,6 +13,20 @@ public class TriggerDetector {
     public static final String WORD_BOUNDARY = "\\b";
     public static final String COMBINING_MARKS_REGEX = "\\p{M}";
 
+    /**
+     * Detects predefined medical trigger terms in a list of note contents.
+     *
+     * <p>Each note is normalized by removing diacritical marks and converting
+     * its content to lowercase. The normalized content is then compared
+     * against the configured variants of each {@link TriggerTermsEnum}.</p>
+     *
+     * <p>Each detected trigger term is added only once to the returned set,
+     * even if it occurs multiple times or in multiple notes.</p>
+     *
+     * @param noteContentList the list of medical note contents to analyze
+     * @return a {@link Set} containing the distinct trigger terms detected
+     *         in the provided notes
+     */
     public static Set<TriggerTermsEnum> detectTriggerTerms(final List<String> noteContentList) {
         Set<TriggerTermsEnum> triggers = new HashSet<>();
 
