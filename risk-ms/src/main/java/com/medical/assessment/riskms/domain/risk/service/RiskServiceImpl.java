@@ -10,6 +10,7 @@ import com.medical.assessment.riskms.infrastructure.client.patient.service.Patie
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Set;
@@ -25,6 +26,27 @@ public class RiskServiceImpl implements RiskService {
     final int FEMALE_IN_DANGER_MIN_TERMS_NUMBER = 4;
     final int FEMALE_EARLY_ON_SET_MIN_TERMS_NUMBER = 7;
 
+    /**
+     * Calculates the medical risk profile of a patient.
+     *
+     * <p>The risk is determined from the patient's medical note contents
+     * by detecting predefined trigger terms. If no notes are available,
+     * the risk level is {@link RiskDto#NO_DATA}. When trigger terms are
+     * detected, the patient's age and gender are used to determine the
+     * appropriate risk level.</p>
+     *
+     * <p>For patients aged 30 or older, the risk level is determined from
+     * the number of detected trigger terms. For patients under 30, the
+     * risk thresholds depend on the patient's gender.</p>
+     *
+     * @param patientId the unique identifier of the patient
+     * @return the calculated {@link RiskDto} representing the patient's
+     *         medical risk level
+     * @throws ResponseStatusException if the patient's notes cannot be
+     *         retrieved or if the patient's information cannot be retrieved
+     *         from the patient service
+     */
+    @Override
     public RiskDto calculatePatientRisk(final Long patientId) {
         final List<String> noteList = noteFeignService.getNoteContentList(patientId);
 
@@ -72,7 +94,7 @@ public class RiskServiceImpl implements RiskService {
         if (numberOfTriggerTerms >= inDangerMinTermsNumber) {
             return RiskDto.IN_DANGER;
         }
-        return RiskDto.UNKNOW;
+        return RiskDto.UNKNOWN;
     }
 
     private Integer calculateNumberOfTriggerTerms(final List<String> noteList) {

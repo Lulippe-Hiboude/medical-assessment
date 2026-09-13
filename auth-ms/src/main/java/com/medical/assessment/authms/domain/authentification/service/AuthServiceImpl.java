@@ -11,6 +11,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +26,20 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
 
-
+    /**
+     * Authenticates a user using the provided credentials and generates a JWT token
+     * containing the user's roles.
+     *
+     * <p>The user is first loaded using its username. The provided password is then
+     * compared with the encoded password stored for the user. If the credentials
+     * are valid, a JWT token is generated and returned inside an {@link AuthResponse}.</p>
+     *
+     * @param authRequest the authentication request containing the username and password
+     * @return an {@link AuthResponse} containing the generated JWT token
+     * @throws UsernameNotFoundException if no user is found with the provided username
+     * @throws BadCredentialsException if the provided password is invalid
+     */
+    @Override
     public AuthResponse authenticateUser(final AuthRequest authRequest) {
         final UserDetails user = userDetailService.loadUserByUsername(authRequest.getUsername());
         if(!passwordEncoder.matches(authRequest.getPassword(), user.getPassword())){

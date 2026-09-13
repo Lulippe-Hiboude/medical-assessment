@@ -59,7 +59,7 @@ components:
               "BORDERLINE",
               "IN_DANGER",
               "EARLY_ONSET",
-              "UNKNOW",
+              "UNKNOWN",
               "NO_DATA"
       ]
       description: the level of risk of the patient

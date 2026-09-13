@@ -12,5 +12,5 @@ export const RISK_LABELS : Record<RiskLevel, string> = {
     IN_DANGER: 'Danger',
     EARLY_ONSET: 'Apparition précoce',
     NO_DATA: 'Pas de données pour calculer le risque',
-    UNKNOWN: 'Inconnu'
+    UNKNOWN: 'Cas non couvert'
 }

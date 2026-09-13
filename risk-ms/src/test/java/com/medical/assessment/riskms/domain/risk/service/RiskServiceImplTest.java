@@ -277,7 +277,7 @@ class RiskServiceImplTest {
 
         //then
         assertThat(result).isNotNull();
-        assertThat(result).isEqualTo(RiskDto.UNKNOW);
+        assertThat(result).isEqualTo(RiskDto.UNKNOWN);
         verify(noteFeignService, times(1)).getNoteContentList(patientId);
         verify(patientFeignService,times(1)).getPatientRiskProfile(patientId);
     }
@@ -304,7 +304,7 @@ class RiskServiceImplTest {
 
         //then
         assertThat(result).isNotNull();
-        assertThat(result).isEqualTo(RiskDto.UNKNOW);
+        assertThat(result).isEqualTo(RiskDto.UNKNOWN);
         verify(noteFeignService, times(1)).getNoteContentList(patientId);
         verify(patientFeignService,times(1)).getPatientRiskProfile(patientId);
     }
